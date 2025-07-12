@@ -1,0 +1,77 @@
+html {
+    margin: 20;
+    padding: 20px;
+}
+h1 {
+    display: flex;
+}
+input.text {
+    display: flex;
+}
+
+.col {
+
+}
+html{
+    text-align: center;
+    font-family: 'Courier New', Courier, monospace;
+    background: linear-gradient(to right, orange,red, pink)
+}
+
+h1, table {
+    size: 2rem;
+    margin: 20px;
+    border-radius: 10px;
+    padding-top: 10px;
+    padding-bottom: 10px;
+    border: thin;
+    border-color: black;
+    background: pink;
+
+}
+
+button, select {
+    background-color: pink;
+    border-radius: 0.5rem;
+    margin-top: 10px;
+    margin-bottom: 10px;
+    padding: 0.4rem;
+    padding-left: 10px;
+    padding-right: 10px;
+    font-family: 'Courier New', Courier, monospace;
+}
+
+input {
+    border-color: pink;
+    border-radius: 0.5rem;
+    display: block;
+    margin: 0 auto;
+    margin-top: 5px;
+}
+
+img{
+    height: 80px;
+}
+
+table{
+    max-width: 500px;
+    padding-top: 10px;
+    border-top: 10%;
+    border-top-color: aqua;
+    padding-bottom: 10px;
+    margin: 0 auto;
+    background-color: aliceblue;
+}
+
+tr {
+    height: 1.5rem;
+}
+
+th {
+    width: 8rem;
+    font-family: 'Courier New', Courier, monospace;
+}
+
+td {
+    text-align: center;
+}
