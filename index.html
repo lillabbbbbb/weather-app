@@ -19,6 +19,7 @@
 
 <body>
     <header>
+        <img src="assets/meteorology.png" alt="">
         <h1>SÄÄ!</h1>
         <form action="submit">
             <input type="text" id="search-bar" placeholder="e.g. Kouvola">
@@ -44,16 +45,6 @@
                         <p id="temperature"></p>
                         <div id="weather-summary"></div>
                         <p id="city">City</p>
-                        <div id="warnings">Warning!
-                            Lorem, ipsum dolor sit amet consectetur adipisicing elit. Quas quisquam id vero, eius natus
-                            similique omnis corrupti ipsam accusamus quo dolor deleniti temporibus eligendi, laboriosam
-                            in
-                            blanditiis itaque impedit iste.
-                            Lorem, ipsum dolor sit amet consectetur adipisicing elit. Quas quisquam id vero, eius natus
-                            similique omnis corrupti ipsam accusamus quo dolor deleniti temporibus eligendi, laboriosam
-                            in
-                            blanditiis itaque impedit iste.</div>
-
                     </div>
                     <button id="add-favorite">Favorite</button>
                     <select id="select-metrics">
@@ -65,11 +56,20 @@
                         Temperature forecast for the next 24 hours
                         <div id="hourly-chart"></div>
                     </div>
-                    <div>Next 7 days</div>
+                    <div id="div-weekly">Next 7 days</div>
                 </div>
 
                 <div class="col border border-success p-2 mb-2">
                     3 of 3
+                    <div id="warnings">Warning!
+                        Lorem, ipsum dolor sit amet consectetur adipisicing elit. Quas quisquam id vero, eius natus
+                        similique omnis corrupti ipsam accusamus quo dolor deleniti temporibus eligendi, laboriosam
+                        in
+                        blanditiis itaque impedit iste.
+                        Lorem, ipsum dolor sit amet consectetur adipisicing elit. Quas quisquam id vero, eius natus
+                        similique omnis corrupti ipsam accusamus quo dolor deleniti temporibus eligendi, laboriosam
+                        in
+                        blanditiis itaque impedit iste.</div>
                     <div id="map"></div>
                 </div>
             </div>

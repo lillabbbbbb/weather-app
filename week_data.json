@@ -1,0 +1,46 @@
+{
+    "data": [
+        {
+            "day": "Monday",
+            "highest": 24,
+            "lowest": 19,
+            "details": ["rain", "sun", "wind"]
+        },
+        {
+            "day": "Tuesday",
+            "highest": 24,
+            "lowest": 19,
+            "details": ["rain", "sun"]
+        },
+        {
+            "day": "Wednesday",
+            "highest": 24,
+            "lowest": 19,
+            "details": ["sun", "hot"]
+        },
+        {
+            "day": "Thursday",
+            "highest": 24,
+            "lowest": 19,
+            "details": ["rain", "sun", "hot"]
+        },
+        {
+            "day": "Friday",
+            "highest": 24,
+            "lowest": 19,
+            "details": ["storm"]
+        },
+        {
+            "day": "Saturday",
+            "highest": 24,
+            "lowest": 19,
+            "details": ["rain", "sun", "wind"]
+        },
+        {
+            "day": "Sunday",
+            "highest": 24,
+            "lowest": 19,
+            "details": ["rain", "sun", "wind"]
+        }
+    ]
+}

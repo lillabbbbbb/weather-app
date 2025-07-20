@@ -4,17 +4,36 @@ const locationButton = document.getElementById("geolocation");
 const currentIconImg = document.getElementById("current-icon")
 const addFavButton = document.getElementById("add-favorite")
 const favDiv = document.getElementById("favorites")
-const selecter = document.getElementById("select-metrics")
-let previousMetric = selecter.value
+const selector = document.getElementById("select-metrics")
+const weeklyDiv = document.getElementById("div-weekly")
+
+const apiKey = "d84bd23391e17b943fc45b049bd574d4"
+let units = getUnits()
+
 
 let favs = []
 
 let icons = {
-    sunny: '<a href="https://www.flaticon.com/free-icons/sunny" title="sunny icons">Sunny icons created by Freepik - Flaticon</a>',
-    cloudyRainySunny: '<a href="https://www.flaticon.com/free-icons/wind" title="wind icons">Wind icons created by Freepik - Flaticon</a>',
-    cloudyWindySunny: '<a href="https://www.flaticon.com/free-icons/clear-sky" title="clear-sky icons">Clear-sky icons created by Freepik - Flaticon</a>',
-    cloudySunny: '<a href="https://www.flaticon.com/free-icons/clouds-and-sun" title="clouds-and-sun icons">Clouds-and-sun icons created by Freepik - Flaticon</a>',
+    
 }
+
+function getUnits() {
+    let units = selector.value
+    if(units == "℃"){
+        units = "&units=metric"
+    }
+    else if(units == "°F"){
+        units = "&units=imperial"
+    }
+    else if(units == "K"){
+        units = "&units=default"
+    }
+    return units
+} 
+selector.addEventListener("change", (e) => {
+    selector.value = e.target.value
+    search(searchArea.value)
+})
 
 const temperatures = {
     current: 24,
@@ -29,11 +48,6 @@ const temperatures = {
 }
 
 //console.log(temperatures.hourlyDay[0].length)
-
-let currTemp = document.getElementById("temperature").innerText = temperatures.current + selecter.value
-createChart()
-currentIconImg.src = "assets/sun.png"
-console.log("source set")
 
 searchButton.addEventListener("click", (e) => {
     addFavButton.innerText = "Favorite"
@@ -59,7 +73,7 @@ searchButton.addEventListener("click", (e) => {
 
 addFavButton.addEventListener("click", () => {
     //check if the current search is already in favorites
-    if (!favs.includes(searchArea.value)) {
+    if (!favs.includes(searchArea.value) && !searchArea.value == "") {
         console.log("Adding " + searchArea.value + " to favorites")
         let p = document.createElement("p")
         Object.assign(p, {
@@ -72,7 +86,7 @@ addFavButton.addEventListener("click", () => {
         favs.push(searchArea.value)
         p.addEventListener("click", () => {
             searchArea.value = p.innerText
-            search(searchArea.value)
+            search(searchArea.value, getUnits)
         })
     }
     else {
@@ -81,69 +95,54 @@ addFavButton.addEventListener("click", () => {
 
 })
 
-selecter.addEventListener("change", (e) => {
-    let newMetric = e.target.value
-
-    console.log(newMetric + " has been chosen now instead of " + previousMetric + ".")
-    //go through all temperatures displayed on page and convert them all
-    temperatures.current = convert(previousMetric, newMetric, temperatures.current)
-    let currTemp = document.getElementById("temperature").innerText = temperatures.current + selecter.value
-
-
-    previousMetric = newMetric
-})
-
-const convert = (previousMetric, newMetric, value) => {
-    const c = "℃"
-    const f = "°F"
-    const k = "K"
-    let newValue;
-    //from Celsius to Fahrenheit
-    if (previousMetric == c && newMetric == f) {
-        newValue = (value * (9 / 5) + 32)
-    }
-
-    //from Fahrenheit to Celsius
-    if (previousMetric == f && newMetric == c) {
-        newValue = ((value - 32) * 5 / 9)
-    }
-
-    //from Celsius to Kelvin
-    if (previousMetric == c && newMetric == k) {
-        newValue = (value + 273.15)
-    }
-
-    //from Kelvin to Celsius
-    if (previousMetric == k && newMetric == c) {
-        newValue = (value - 273.15)
-    }
-
-    //from Fahrenheit to Kelvin
-    if (previousMetric == f && newMetric == k) {
-        newValue = ((value - 32) * 5 / 9 + 273.15)
-    }
-
-    //from Kelvin to Fahrenheit
-    if (previousMetric == k && newMetric == f) {
-        newValue = ((value - 273.15) * 9 / 5 + 32)
-    }
-    console.log(value + previousMetric + " has been changed to " + newValue + newMetric)
-    return newValue
-}
-
-const search = (searchTerm) => {
+const search = async(searchTerm) => {
     //console.log(searchTerm)
     document.getElementById("city").innerText = searchTerm
     console.log("Searching for " + searchTerm)
+
+    let JSON = await ((await fetch("https://api.openweathermap.org/data/2.5/weather?q=" + searchTerm +"&appid=" + apiKey + getUnits())).json())
+    console.log(JSON)
+
+    let mainWeatherDescr = JSON.weather[0].description
+    let mainWeather = JSON.weather[0].main
+    let feelsLike = JSON.main.feels_like
+    let humidity = JSON.main.humidity
+    let pressure = JSON.main.pressure
+    let visibility = JSON.sys.visibility
+
+
+    let windDegree = JSON.wind.deg
+    let windSpeed = JSON.wind.speed
+
+    document.getElementById("temperature").innerText = JSON.main.temp + selector.value
+
+    createChart()
+    getWeeklyForecast(7)
+
 }
 
-function createChart() {
+async function createChart () {
+
+    const url = "https://pro.openweathermap.org/data/2.5/forecast/hourly?q=" + searchArea.value + "&appid=" + apiKey + getUnits()
+    console.log(url)
+    let hourlyJSON = await ((await (fetch(url))).json())
+    console.log(hourlyJSON)
+
+    console.log(hourlyJSON.list[0].main.temp)
+    console.log(hourlyJSON.list[0].dt_text)
+
+    let owmHourlyValues = []
+    for(let i = 0; i < 24; i++){
+        owmHourlyValues.push(hourlyJSON.list[i].main.temp)
+    }
+    console.log(owmHourlyValues)
+
     const hourlyChartData = {
         labels: [7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19, 20, 21, 22, 23, 0, 1, 2, 3, 4, 5, 6],
         datasets: [
             {
-                name: "First API",
-                values: temperatures.hourlyDay[0]
+                name: "Open Weather Map API",
+                values: owmHourlyValues
             },
             {
                 name: "Second API",
@@ -161,6 +160,35 @@ function createChart() {
 
 }
 
+const getWeeklyForecast = async(numberOfDays) => {
+    while(weeklyDiv.lastElementChild){
+        weeklyDiv.removeChild(lastElementChild)
+    }
+
+    url = "https://api.openweathermap.org/data/2.5/forecast/daily?q=" + searchArea.value + "&cnt=" + numberOfDays + "&appid=" + apiKey + getUnits()
+    console.log(url)
+    const weeklyJSON = await((await fetch(url)).json())
+    console.log(weeklyJSON)
+
+    for(let i = 0; i < weeklyJSON.list.length; i++){
+        const dayWidgetDiv = document.createElement("div")
+        const dayDiv = document.createElement("div")
+        dayDiv.innerText = weeklyJSON.list[i].temp.day + selector.value
+        const minDiv = document.createElement("div")
+        minDiv.innerText = weeklyJSON.list[i].temp.min  + selector.value
+        const maxDiv = document.createElement("div")
+        maxDiv.innerText = weeklyJSON.list[i].temp.max  + selector.value
+
+        dayWidgetDiv.appendChild(dayDiv)
+        dayWidgetDiv.appendChild(minDiv)
+        dayWidgetDiv.appendChild(maxDiv)
+
+        weeklyDiv.appendChild(dayWidgetDiv)
+    }
+    
+
+}
+/*
 let map, infoWindow;
 //source: https://developers.google.com/maps/documentation/javascript/geolocation#maps_map_geolocation-javascript 
 function initMap() {
@@ -211,3 +239,8 @@ function handleLocationError(browserHasGeolocation, infoWindow, pos) {
 }
 
 window.initMap = initMap;
+initMap()
+*/
+
+//createChart()
+currentIconImg.src = "assets/sun.png"
