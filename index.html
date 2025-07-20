@@ -4,12 +4,15 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <!--Importing Frappe charts-->
+    <script src="https://unpkg.com/frappe-charts@1.2.4/dist/frappe-charts.min.iife.js"></script>
     <!--Importing Bootstrap-->
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.7/dist/css/bootstrap.min.css" rel="stylesheet"
         integrity="sha384-LN+7fdVzj6u52u30Kp6M/trliBMCMKTyK833zpbD+pXdCLuTusPj697FH4R/5mcr" crossorigin="anonymous">
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.7/dist/js/bootstrap.bundle.min.js"
         integrity="sha384-ndDqU0Gzau9qJ1lfW4pNLlhNTkCfHzAVBReH9diLvGRem5+R9g2FzA8ZGN954O5Q"
         crossorigin="anonymous"></script>
+    <script src="index.js" defer></script>
     <link rel="stylesheet" href="css.css">
     <title>Weather App</title>
 </head>
@@ -17,8 +20,11 @@
 <body>
     <header>
         <h1>SÄÄ!</h1>
-        <input type="text" name="search-bar" id="search-bar" placeholder="e.g. Kouvola">
-        <button>Use current location</button>
+        <form action="submit">
+            <input type="text" id="search-bar" placeholder="e.g. Kouvola">
+            <button id="button-search">Search</button>
+        </form>
+        <button id="geolocation">Use current location</button>
     </header>
     <main>
         <div class="container text-center ">
@@ -26,45 +32,51 @@
             <div class="row rounded-2">
                 <div class="col border border-success p-2 mb-2">
 
-                    <div>Favorites:</div>
+                    <div id="favorites">Favorites:
+                    </div>
                     <div>Last visited:</div>
 
                 </div>
 
-                <div class="col-7 bg-primary-subtle border border-success p-2 mb-2 " >
-                    <div>Currently</div>
-                    <button>Favorite</button>
-                    <select name="select-metrics" id="select-metrics"></select>
-                    Lorem, ipsum dolor sit amet consectetur adipisicing elit. Quas quisquam id vero, eius natus
-                    similique omnis corrupti ipsam accusamus quo dolor deleniti temporibus eligendi, laboriosam in
-                    blanditiis itaque impedit iste.
-                    Lorem, ipsum dolor sit amet consectetur adipisicing elit. Quas quisquam id vero, eius natus
-                    similique omnis corrupti ipsam accusamus quo dolor deleniti temporibus eligendi, laboriosam in
-                    blanditiis itaque impedit iste.
-                    Lorem, ipsum dolor sit amet consectetur adipisicing elit. Quas quisquam id vero, eius natus
-                    similique omnis corrupti ipsam accusamus quo dolor deleniti temporibus eligendi, laboriosam in
-                    blanditiis itaque impedit iste.
-                    Lorem, ipsum dolor sit amet consectetur adipisicing elit. Quas quisquam id vero, eius natus
-                    similique omnis corrupti ipsam accusamus quo dolor deleniti temporibus eligendi, laboriosam in
-                    blanditiis itaque impedit iste.
-                    Lorem, ipsum dolor sit amet consectetur adipisicing elit. Quas quisquam id vero, eius natus
-                    similique omnis corrupti ipsam accusamus quo dolor deleniti temporibus eligendi, laboriosam in
-                    blanditiis itaque impedit iste.
-                    <div>
-                        Next 24 hours hourly Graphs (2 data)
+                <div class="col-7 bg-primary-subtle border border-success p-2 mb-2 ">
+                    <div>Currently
+                        <div><img id="current-icon" src="" alt=""></div>
+                        <p id="temperature"></p>
+                        <div id="weather-summary"></div>
+                        <p id="city">City</p>
+                        <div id="warnings">Warning!
+                            Lorem, ipsum dolor sit amet consectetur adipisicing elit. Quas quisquam id vero, eius natus
+                            similique omnis corrupti ipsam accusamus quo dolor deleniti temporibus eligendi, laboriosam
+                            in
+                            blanditiis itaque impedit iste.
+                            Lorem, ipsum dolor sit amet consectetur adipisicing elit. Quas quisquam id vero, eius natus
+                            similique omnis corrupti ipsam accusamus quo dolor deleniti temporibus eligendi, laboriosam
+                            in
+                            blanditiis itaque impedit iste.</div>
 
+                    </div>
+                    <button id="add-favorite">Favorite</button>
+                    <select id="select-metrics">
+                        <option selected value="℃">Celsius</option>
+                        <option value="°F">Fahrenheit</option>
+                        <option value="K">Kelvin</option>
+                    </select>
+                    <div>
+                        Temperature forecast for the next 24 hours
+                        <div id="hourly-chart"></div>
                     </div>
                     <div>Next 7 days</div>
                 </div>
 
                 <div class="col border border-success p-2 mb-2">
                     3 of 3
+                    <div id="map"></div>
                 </div>
             </div>
         </div>
     </main>
     <footer>
-
+        <p>Weather icons from <a href="https://www.flaticon.com/authors/freepik">FreePik at Flaticon</a></p>
     </footer>
 </body>
 
