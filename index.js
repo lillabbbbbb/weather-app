@@ -16,6 +16,7 @@ let map;
 
 
 let favs = []
+let lastVisited = []
 
 let icons = {
 
@@ -79,18 +80,12 @@ locationButton.addEventListener("click", async () => {
     //source: https://developer.mozilla.org/en-US/docs/Web/API/Geolocation_API/Using_the_Geolocation_API#examples
 
     const status = document.querySelector("#status");
-    const mapLink = document.querySelector("#map");
-
-    mapLink.href = "";
-    mapLink.textContent = "";
 
     async function success(position) {
         const latitude = position.coords.latitude;
         const longitude = position.coords.longitude;
 
         status.textContent = "";
-        mapLink.href = `https://www.openstreetmap.org/#map=18/${latitude}/${longitude}`;
-        mapLink.textContent = `Latitude: ${latitude} °, Longitude: ${longitude} °`;
 
         let JSON = await ((await fetch("https://api.openweathermap.org/data/2.5/weather?lat=" + latitude + "&lon=" + longitude + "&appid=" + apiKey1 + getUnits())).json())
         //console.log(JSON)
@@ -147,7 +142,7 @@ const searchByCityName = async (searchTerm) => {
     let countryCode = JSON.sys.country
     document.getElementById("country").innerText = countryCode
 
-    currentIconImg.src = loadIcon(JSON.weather[0].main)
+    currentIconImg.src = loadMyIcon(JSON.weather[0].description)
 
     let mainWeatherDescr = JSON.weather[0].description
     let mainWeather = JSON.weather[0].main
@@ -181,7 +176,6 @@ const searchByCityName = async (searchTerm) => {
 }
 
 const searchByLatLong = async (latitude, longitude) => {
-    //console.log(searchTerm)
 
     let JSON = await ((await fetch("https://api.openweathermap.org/data/2.5/weather?lat=" + latitude + "&lon=" + longitude + "&appid=" + apiKey1 + getUnits())).json())
     console.log(JSON)
@@ -353,7 +347,7 @@ const getWeeklyForecast = async (numberOfDays) => {
         maxDiv.innerText = "Max: " + weeklyJSON.list[i].temp.max + selector.value
 
         const icon = document.createElement("img")
-        icon.src = loadIcon(weeklyJSON.list[i].weather[0].main)
+        icon.src = loadOWMIcon(weeklyJSON.list[i].weather[0].description)
 
         dayWidgetDiv.appendChild(icon)
         dayWidgetDiv.appendChild(dayDiv)
@@ -367,36 +361,69 @@ const getWeeklyForecast = async (numberOfDays) => {
 }
 
 //returns path to the corresponding icon based on @description
-const loadIcon = (description) => {
+const loadMyIcon = (description) => {
 
     icons = {
-        cloudRainSun : "assets/cloud_rain_sun.png",
-        cloudWindSun : "assets/cloud_wind_sun.png",
-        cloudSun : "assets/cloud_sun.png",
-        hot : "assets/hot.png",
-        snow : "assets/snowflake.png",
-        sun : "assets/sun.png",
-        storm : "assets/storm",
-        cloud : "assets/cloud.png"
+        cloudRainSun: "assets/cloud_rain_sun.png",
+        cloudWindSun: "assets/cloud_wind_sun.png",
+        cloudSun: "assets/cloud_sun.png",
+        hot: "assets/hot.png",
+        snow: "assets/snowflake.png",
+        sun: "assets/sun.png",
+        storm: "assets/storm",
+        cloud: "assets/cloud.png"
     }
 
     description = description.toLowerCase()
 
-    if(description.includes("snow")){
+    if (description.includes("snow")) {
         return icons.snow
     }
-    else if(description.includes("storm")){
+    else if (description.includes("storm")) {
         return icons.storm
-    }else if(description.includes("cloud")){
+    } else if (description.includes("cloud")) {
         return icons.cloud
-    }else if(description.includes("rain")){
+    } else if (description.includes("rain")) {
         return icons.cloudRainSun
-    }else if(description.includes("sun") || description.includes("clear")){
+    } else if (description.includes("sun") || description.includes("clear")) {
         return icons.sun
     }
 }
 
-const loadMap = async(lat, lon) => {;
+const loadOWMIcon = (description) => {
+
+    iconCodes = {
+        "clear sky": "01d",
+        "few clouds": "02d",
+        "scattered clouds": "03d",
+        "broken clouds": "04d",
+        "shower rain": "09d",
+        "rain": "10d",
+        "thunderstorm": "11d",
+        "snow": "13d",
+        "mist": "50d",
+
+    }
+
+    let code;
+
+    for (let [key, value] of Object.entries(iconCodes)) {
+        console.log(`${key}: ${value}`);
+        console.log(description)
+        if(description = key){
+            code = value
+            console.log(code)
+            break
+        }
+    }
+
+
+    return "https://openweathermap.org/img/wn/" + code + "@2x.png"
+}
+
+
+const loadMap = async (lat, lon) => {
+    ;
     if (!map) {
         console.log("Map is being initialized.")
         map = L.map('map').setView([lat, lon], 7);
@@ -409,7 +436,7 @@ const loadMap = async(lat, lon) => {;
         let temp = L.tileLayer('http://maps.openweathermap.org/maps/2.0/weather/TA2/{z}/{x}/{y}?opacity=0.6&fill_bound=true&appid=' + apiKey1, {
             attribution: '&copy; <a href="https://openweathermap.org/api/weather-map-2">OpenWeatherMap</a> contributors'
         }).addTo(map);
-        
+
         let precip = L.tileLayer('http://maps.openweathermap.org/maps/2.0/weather/PA0/{z}/{x}/{y}?opacity=0.7&fill_bound=true&appid=' + apiKey1, {
             attribution: '&copy; <a href="https://openweathermap.org/api/weather-map-2">OpenWeatherMap</a> contributors'
         })
@@ -419,16 +446,16 @@ const loadMap = async(lat, lon) => {;
         let wind = L.tileLayer('http://maps.openweathermap.org/maps/2.0/weather/WND/{z}/{x}/{y}?opacity=0.6&fill_bound=true&appid=' + apiKey1, {
             attribution: '&copy; <a href="https://openweathermap.org/api/weather-map-2">OpenWeatherMap</a> contributors'
         });
-        
+
 
 
         let baseMaps = {
-            "TempMap" : temp,
-            "Precipitation" : precip,
-            "Pressure" : pressure,
-            "Wind" : wind,
+            "TempMap": temp,
+            "Precipitation": precip,
+            "Pressure": pressure,
+            "Wind": wind,
         }
-    
+
         let layerControl = L.control.layers(baseMaps).addTo(map)
 
     } else {
