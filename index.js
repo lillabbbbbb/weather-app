@@ -12,6 +12,7 @@ const apiKey2 = "Cgp1nINqRCsErUN8HM74lwRgOyAP0ulF"
 const apikey3 = ""
 
 let units = getUnits()
+let map;
 
 
 let favs = []
@@ -146,6 +147,8 @@ const searchByCityName = async (searchTerm) => {
     let countryCode = JSON.sys.country
     document.getElementById("country").innerText = countryCode
 
+    currentIconImg.src = loadIcon(JSON.weather[0].main)
+
     let mainWeatherDescr = JSON.weather[0].description
     let mainWeather = JSON.weather[0].main
     let feelsLike = JSON.main.feels_like
@@ -157,7 +160,7 @@ const searchByCityName = async (searchTerm) => {
     document.getElementById("feels-like").innerText = "Feels like " + feelsLike + selector.value
     document.getElementById("humidity").innerText = "Humidity: " + humidity + "%"
     document.getElementById("pressure").innerText = "Pressure: " + pressure + "hPa"
-    document.getElementById("visibility").innerText = "Visbility: " + visibility + "km"
+    document.getElementById("visibility").innerText = "Visibility: " + visibility + "km"
 
 
     let windDegree = JSON.wind.deg
@@ -170,6 +173,10 @@ const searchByCityName = async (searchTerm) => {
 
     createChart()
     getWeeklyForecast(7)
+
+    const latitude = JSON.coord.lat
+    const longitude = JSON.coord.lon
+    loadMap(latitude, longitude)
 
 }
 
@@ -189,22 +196,26 @@ const searchByLatLong = async (latitude, longitude) => {
     let feelsLike = JSON.main.feels_like
     let humidity = JSON.main.humidity
     let pressure = JSON.main.pressure
-    let visibility = JSON.visibility
+    let visibility = JSON.visibility / 1000
 
     document.getElementById("main-description").innerText = mainWeather
-    document.getElementById("feels-like").innerText = feelsLike + selector.value
-    document.getElementById("humidity").innerText = humidity
-    document.getElementById("pressure").innerText = pressure
-    document.getElementById("visibility").innerText = visibility + "m"
+    document.getElementById("feels-like").innerText = "Feels like " + feelsLike + selector.value
+    document.getElementById("humidity").innerText = "Humidity: " + humidity + "%"
+    document.getElementById("pressure").innerText = "Pressure: " + pressure + "hPa"
+    document.getElementById("visibility").innerText = "Visibility: " + visibility + "km"
 
 
     let windDegree = JSON.wind.deg
     let windSpeed = JSON.wind.speed
 
+    document.getElementById("wind-deg").innerText = "Wind degree: " + windDegree + "°"
+    document.getElementById("wind-speed").innerText = "Wind speed: " + windSpeed + "km/h"
+
     document.getElementById("temperature").innerText = JSON.main.temp + selector.value
 
     createChart()
     getWeeklyForecast(7)
+    loadMap(latitude, longitude)
 
 }
 
@@ -281,15 +292,15 @@ async function createChart() {
     */
 
 
-    
+
 
     //Fetch Third API: Open Meteo API
     //Note: Open Meteo search works only with lat and long. I am using the lat and long values of the search from the first API because that's the most convenient
-    const latitude = hourlyJSON.city.coord.lat
-    const longitude = hourlyJSON.city.coord.lon
+    let latitude = hourlyJSON.city.coord.lat
+    let longitude = hourlyJSON.city.coord.lon
 
     const url3 = "https://api.open-meteo.com/v1/forecast?latitude=" + latitude + "&longitude=" + longitude + "&current=temperature_2m,wind_speed_10m&hourly=temperature_2m,relative_humidity_2m,wind_speed_10m"
-    const omHourlyJSON = await( (await (fetch(url3))).json())
+    const omHourlyJSON = await ((await (fetch(url3))).json())
     console.log(omHourlyJSON)
 
 
@@ -333,6 +344,7 @@ const getWeeklyForecast = async (numberOfDays) => {
 
     for (let i = 0; i < weeklyJSON.list.length; i++) {
         const dayWidgetDiv = document.createElement("div")
+        dayWidgetDiv.setAttribute("class", "daily-f-card-div")
         const dayDiv = document.createElement("div")
         dayDiv.innerText = "Day " + (i + 1) + ": " + weeklyJSON.list[i].temp.day + selector.value
         const minDiv = document.createElement("div")
@@ -340,6 +352,10 @@ const getWeeklyForecast = async (numberOfDays) => {
         const maxDiv = document.createElement("div")
         maxDiv.innerText = "Max: " + weeklyJSON.list[i].temp.max + selector.value
 
+        const icon = document.createElement("img")
+        icon.src = loadIcon(weeklyJSON.list[i].weather[0].main)
+
+        dayWidgetDiv.appendChild(icon)
         dayWidgetDiv.appendChild(dayDiv)
         dayWidgetDiv.appendChild(minDiv)
         dayWidgetDiv.appendChild(maxDiv)
@@ -347,6 +363,78 @@ const getWeeklyForecast = async (numberOfDays) => {
         weeklyDiv.appendChild(dayWidgetDiv)
     }
 
+
+}
+
+//returns path to the corresponding icon based on @description
+const loadIcon = (description) => {
+
+    icons = {
+        cloudRainSun : "assets/cloud_rain_sun.png",
+        cloudWindSun : "assets/cloud_wind_sun.png",
+        cloudSun : "assets/cloud_sun.png",
+        hot : "assets/hot.png",
+        snow : "assets/snowflake.png",
+        sun : "assets/sun.png",
+        storm : "assets/storm",
+        cloud : "assets/cloud.png"
+    }
+
+    description = description.toLowerCase()
+
+    if(description.includes("snow")){
+        return icons.snow
+    }
+    else if(description.includes("storm")){
+        return icons.storm
+    }else if(description.includes("cloud")){
+        return icons.cloud
+    }else if(description.includes("rain")){
+        return icons.cloudRainSun
+    }else if(description.includes("sun") || description.includes("clear")){
+        return icons.sun
+    }
+}
+
+const loadMap = async(lat, lon) => {;
+    if (!map) {
+        console.log("Map is being initialized.")
+        map = L.map('map').setView([lat, lon], 7);
+
+        let osm = L.tileLayer('https://tile.openstreetmap.org/{z}/{x}/{y}.png', {
+            maxZoom: 19,
+            attribution: '&copy; <a href="http://www.openstreetmap.org/copyright">OpenStreetMap</a>'
+        }).addTo(map);
+
+        let temp = L.tileLayer('http://maps.openweathermap.org/maps/2.0/weather/TA2/{z}/{x}/{y}?opacity=0.6&fill_bound=true&appid=' + apiKey1, {
+            attribution: '&copy; <a href="https://openweathermap.org/api/weather-map-2">OpenWeatherMap</a> contributors'
+        }).addTo(map);
+        
+        let precip = L.tileLayer('http://maps.openweathermap.org/maps/2.0/weather/PA0/{z}/{x}/{y}?opacity=0.7&fill_bound=true&appid=' + apiKey1, {
+            attribution: '&copy; <a href="https://openweathermap.org/api/weather-map-2">OpenWeatherMap</a> contributors'
+        })
+        let pressure = L.tileLayer('http://maps.openweathermap.org/maps/2.0/weather/APM/{z}/{x}/{y}?opacity=0.6&fill_bound=true&appid=' + apiKey1, {
+            attribution: '&copy; <a href="https://openweathermap.org/api/weather-map-2">OpenWeatherMap</a> contributors'
+        })
+        let wind = L.tileLayer('http://maps.openweathermap.org/maps/2.0/weather/WND/{z}/{x}/{y}?opacity=0.6&fill_bound=true&appid=' + apiKey1, {
+            attribution: '&copy; <a href="https://openweathermap.org/api/weather-map-2">OpenWeatherMap</a> contributors'
+        });
+        
+
+
+        let baseMaps = {
+            "TempMap" : temp,
+            "Precipitation" : precip,
+            "Pressure" : pressure,
+            "Wind" : wind,
+        }
+    
+        let layerControl = L.control.layers(baseMaps).addTo(map)
+
+    } else {
+        console.log("New view set.")
+        map.setView([lat, lon])
+    }
 
 }
 
@@ -403,6 +491,3 @@ function handleLocationError(browserHasGeolocation, infoWindow, pos) {
 window.initMap = initMap;
 initMap()
 */
-
-//createChart()
-currentIconImg.src = "assets/sun.png"

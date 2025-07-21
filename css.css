@@ -1,6 +1,14 @@
+:root{
+    --main-color: #ffe209;
+    --main-background-color: linear-gradient(120deg, #ffe209,#0000ff)
+}
+
+#map { height: 800px; }
+
 html {
-    margin: 20;
+    margin: 30;
     padding: 20px;
+    background-color: black;
 }
 h1 {
     display: flex;
@@ -12,10 +20,11 @@ input.text {
 .col {
 
 }
-html{
+html, body{
     text-align: center;
-    font-family: 'Courier New', Courier, monospace;
-    background: linear-gradient(to right, orange,red, pink)
+    font-family: Bahnschrift, 'DIN Alternate', 'Franklin Gothic Medium', 'Nimbus Sans Narrow', sans-serif-condensed, sans-serif;
+font-weight: normal;
+    background: linear-gradient(120deg, #0000ff,red)
 }
 
 h1, table {
@@ -26,12 +35,12 @@ h1, table {
     padding-bottom: 10px;
     border: thin;
     border-color: black;
-    background: pink;
+    background: var(--main-background-color);
 
 }
 
 button, select {
-    background-color: pink;
+    background-color: linear-gradient(90deg, #ffe209,#0000ff);
     border-radius: 0.5rem;
     margin-top: 10px;
     margin-bottom: 10px;
@@ -42,15 +51,29 @@ button, select {
 }
 
 input {
-    border-color: pink;
+    border-color: var(--main-color);
     border-radius: 0.5rem;
     display: block;
     margin: 0 auto;
     margin-top: 5px;
 }
 
-img{
-    height: 80px;
+img {
+    height: 70px;
+}
+
+#current-icon{
+    height: 150px;
+    float: left;
+    margin: 30px;
+}
+#temperature{
+    font-size: 40px;
+    text-align: left;
+    vertical-align:middle;
+}
+#city, #country{
+    display: flex;
 }
 
 table{
@@ -74,4 +97,29 @@ th {
 
 td {
     text-align: center;
+}
+.card-div {
+    background-color: white;
+    border-radius: 10px;
+    margin: 10px;
+    padding-top: 10px;
+    padding-bottom: 10px;
+    border: thin;
+    border-color: black;
+
+}
+
+.daily-f-card-div {
+    background-color: var(--main-color);
+    border-radius: 10px;
+    margin: 0px 0px 10px 0px;
+    padding-top: 10px;
+    padding-bottom: 10px;
+    border: thin;
+    border-color: black;
+
+}
+
+#map {
+    border-radius: 10px;
 }
