@@ -7,7 +7,10 @@ const favDiv = document.getElementById("favorites")
 const selector = document.getElementById("select-metrics")
 const weeklyDiv = document.getElementById("div-weekly")
 
-const apiKey = "d84bd23391e17b943fc45b049bd574d4"
+const apiKey1 = "d84bd23391e17b943fc45b049bd574d4"
+const apiKey2 = "Cgp1nINqRCsErUN8HM74lwRgOyAP0ulF"
+const apikey3 = ""
+
 let units = getUnits()
 
 
@@ -71,7 +74,7 @@ searchButton.addEventListener("click", (e) => {
 
 })
 
-locationButton.addEventListener("click", async() => {
+locationButton.addEventListener("click", async () => {
     //source: https://developer.mozilla.org/en-US/docs/Web/API/Geolocation_API/Using_the_Geolocation_API#examples
 
     const status = document.querySelector("#status");
@@ -88,7 +91,7 @@ locationButton.addEventListener("click", async() => {
         mapLink.href = `https://www.openstreetmap.org/#map=18/${latitude}/${longitude}`;
         mapLink.textContent = `Latitude: ${latitude} °, Longitude: ${longitude} °`;
 
-        let JSON = await ((await fetch("https://api.openweathermap.org/data/2.5/weather?lat=" + latitude + "&lon=" + longitude + "&appid=" + apiKey + getUnits())).json())
+        let JSON = await ((await fetch("https://api.openweathermap.org/data/2.5/weather?lat=" + latitude + "&lon=" + longitude + "&appid=" + apiKey1 + getUnits())).json())
         //console.log(JSON)
         //console.log("JSON.name:" + JSON.name)
         searchByLatLong(latitude, longitude)
@@ -100,7 +103,8 @@ locationButton.addEventListener("click", async() => {
 
     if (!navigator.geolocation) {
         status.textContent = "Geolocation is not supported by your browser";
-    }else{
+        alert("Geolocation is not supported by your browser")
+    } else {
         navigator.geolocation.getCurrentPosition(success, error);
     }
 
@@ -133,12 +137,12 @@ addFavButton.addEventListener("click", () => {
 
 const searchByCityName = async (searchTerm) => {
     //console.log(searchTerm)
-    searchArea.value = searchTerm
 
-    let JSON = await ((await fetch("https://api.openweathermap.org/data/2.5/weather?q=" + searchTerm + "&appid=" + apiKey + getUnits())).json())
+    let JSON = await ((await fetch("https://api.openweathermap.org/data/2.5/weather?q=" + searchTerm + "&appid=" + apiKey1 + getUnits())).json())
     console.log(JSON)
     console.log("Searching for " + JSON.name)
     document.getElementById("city").innerText = JSON.name
+    searchArea.value = JSON.name
     let countryCode = JSON.sys.country
     document.getElementById("country").innerText = countryCode
 
@@ -159,6 +163,9 @@ const searchByCityName = async (searchTerm) => {
     let windDegree = JSON.wind.deg
     let windSpeed = JSON.wind.speed
 
+    document.getElementById("wind-deg").innerText = "Wind degree: " + windDegree + "°"
+    document.getElementById("wind-speed").innerText = "Wind speed: " + windSpeed + "km/h"
+
     document.getElementById("temperature").innerText = JSON.main.temp + selector.value
 
     createChart()
@@ -169,7 +176,7 @@ const searchByCityName = async (searchTerm) => {
 const searchByLatLong = async (latitude, longitude) => {
     //console.log(searchTerm)
 
-    let JSON = await ((await fetch("https://api.openweathermap.org/data/2.5/weather?lat=" + latitude + "&lon=" + longitude + "&appid=" + apiKey + getUnits())).json())
+    let JSON = await ((await fetch("https://api.openweathermap.org/data/2.5/weather?lat=" + latitude + "&lon=" + longitude + "&appid=" + apiKey1 + getUnits())).json())
     console.log(JSON)
     searchArea.value = JSON.name
     let countryCode = JSON.sys.country
@@ -203,9 +210,10 @@ const searchByLatLong = async (latitude, longitude) => {
 
 async function createChart() {
 
-    const url = "https://pro.openweathermap.org/data/2.5/forecast/hourly?q=" + searchArea.value + "&appid=" + apiKey + getUnits()
-    console.log(url)
-    let hourlyJSON = await ((await (fetch(url))).json())
+    //Fetch First API: Open Weather Map API
+    const url1 = "https://pro.openweathermap.org/data/2.5/forecast/hourly?q=" + searchArea.value + "&appid=" + apiKey1 + getUnits()
+    console.log(url1)
+    let hourlyJSON = await ((await (fetch(url1))).json())
     console.log(hourlyJSON)
 
     console.log(hourlyJSON.list[0].main.temp)
@@ -224,22 +232,70 @@ async function createChart() {
 
     let startIndex;
 
-    for(let i = 0; i < hourlyJSON.list.length; i++){
+    for (let i = 0; i < hourlyJSON.list.length; i++) {
         //console.log(i + ":   hour = " + hour + ", parseInt(hourlyJSON.list[i].dt_txt.substring(10,13)) = " + parseInt(hourlyJSON.list[i].dt_txt.substring(10,13)))
-        if((hour + 1 ) == parseInt(hourlyJSON.list[i].dt_txt.substring(10,13))){
+        if ((hour + 1) == parseInt(hourlyJSON.list[i].dt_txt.substring(10, 13)) || (hour - 23) == parseInt(hourlyJSON.list[i].dt_txt.substring(10, 13))) {
             startIndex = i;
             break;
         }
     }
     console.log(startIndex)
     for (let i = startIndex; i < startIndex + 24; i++) {
-       owmHourlyValues.push(hourlyJSON.list[i].main.temp)
-       owmHourlyLabels.push(hourlyJSON.list[i].dt_txt.substring(10,13))
+        owmHourlyValues.push(hourlyJSON.list[i].main.temp)
+        owmHourlyLabels.push(hourlyJSON.list[i].dt_txt.substring(10, 13))
     }
 
     console.log(owmHourlyValues)
     console.log(owmHourlyLabels)
 
+
+
+    //Fetch Second API: Tomorrow IO API
+    /*
+    const url2 = "https://api.tomorrow.io/v4/weather/forecast?location=" + searchArea.value + "&timesteps=1h" + getUnits() + "&apikey=Cgp1nINqRCsErUN8HM74lwRgOyAP0ulF"
+    const tomHourlyJSON = await( (await (fetch(url2))).json())
+    console.log(tomHourlyJSON)
+
+
+    let tomHourlyValues = []
+    let tomHourlyLabels = []
+
+    let startIndex2;
+
+    console.log(tomHourlyJSON.timelines.hourly[0].time.substring(11,13))
+
+    for (let i = 0; i < tomHourlyJSON.timelines.hourly.length; i++) {
+        console.log(i + ":   hour = " + hour + ", tomHourlyJSON.timelines.hourly[i].time.substring(11,13) = " + tomHourlyJSON.timelines.hourly[i].time.substring(11,13))
+        if ((hour + 1) == parseInt(tomHourlyJSON.timelines.hourly[i].time.substring(11,13)) || (hour - 23) == parseInt(tomHourlyJSON.timelines.hourly[i].time.substring(11,13))) {
+            startIndex2 = i;
+            break;
+        }
+    }
+    console.log(startIndex2)
+    for (let i = startIndex + 1; i < startIndex + 1 + 24; i++) {
+        tomHourlyValues.push(tomHourlyJSON.timelines.hourly[i].values.temperature)
+        tomHourlyLabels.push(tomHourlyJSON.timelines.hourly[i].time.substring(11,13))
+    }
+    console.log(tomHourlyValues)
+    console.log(tomHourlyLabels)
+    */
+
+
+    
+
+    //Fetch Third API: Open Meteo API
+    //Note: Open Meteo search works only with lat and long. I am using the lat and long values of the search from the first API because that's the most convenient
+    const latitude = hourlyJSON.city.coord.lat
+    const longitude = hourlyJSON.city.coord.lon
+
+    const url3 = "https://api.open-meteo.com/v1/forecast?latitude=" + latitude + "&longitude=" + longitude + "&current=temperature_2m,wind_speed_10m&hourly=temperature_2m,relative_humidity_2m,wind_speed_10m"
+    const omHourlyJSON = await( (await (fetch(url3))).json())
+    console.log(omHourlyJSON)
+
+
+
+
+    //build chart
     const hourlyChartData = {
         labels: owmHourlyLabels,
         datasets: [
@@ -248,8 +304,10 @@ async function createChart() {
                 values: owmHourlyValues
             },
             {
-                name: "Second API",
+                name: "predefined data",
                 values: temperatures.hourlyDay[1]
+                //name: "Tomorrow API",
+                //values: tomHourlyValues
             }
         ]
     }
@@ -268,9 +326,9 @@ const getWeeklyForecast = async (numberOfDays) => {
         weeklyDiv.removeChild(weeklyDiv.lastElementChild)
     }
     console.log(getUnits())
-    url = "https://api.openweathermap.org/data/2.5/forecast/daily?q=" + searchArea.value + "&cnt=" + numberOfDays + "&appid=" + apiKey + getUnits()
-    console.log(url)
-    const weeklyJSON = await ((await fetch(url)).json())
+    url1 = "https://api.openweathermap.org/data/2.5/forecast/daily?q=" + searchArea.value + "&cnt=" + numberOfDays + "&appid=" + apiKey1 + getUnits()
+    console.log(url1)
+    const weeklyJSON = await ((await fetch(url1)).json())
     console.log(weeklyJSON)
 
     for (let i = 0; i < weeklyJSON.list.length; i++) {
