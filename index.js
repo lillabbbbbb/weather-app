@@ -14,25 +14,25 @@ let units = getUnits()
 let favs = []
 
 let icons = {
-    
+
 }
 
 function getUnits() {
     let units = selector.value
-    if(units == "℃"){
+    if (units == "℃") {
         units = "&units=metric"
     }
-    else if(units == "°F"){
+    else if (units == "°F") {
         units = "&units=imperial"
     }
-    else if(units == "K"){
+    else if (units == "K") {
         units = "&units=default"
     }
     return units
-} 
+}
 selector.addEventListener("change", (e) => {
     selector.value = e.target.value
-    search(searchArea.value)
+    searchByCityName(searchArea.value)
 })
 
 const temperatures = {
@@ -58,7 +58,7 @@ searchButton.addEventListener("click", (e) => {
     e.preventDefault()
 
     let input = searchArea.value
-    search(input)
+    searchByCityName(input)
 
     //check if the current search is already in favorites
     console.log("Checking now")
@@ -68,6 +68,42 @@ searchButton.addEventListener("click", (e) => {
             addFavButton.innerText = "Favorited"
         }
     }
+
+})
+
+locationButton.addEventListener("click", async() => {
+    //source: https://developer.mozilla.org/en-US/docs/Web/API/Geolocation_API/Using_the_Geolocation_API#examples
+
+    const status = document.querySelector("#status");
+    const mapLink = document.querySelector("#map");
+
+    mapLink.href = "";
+    mapLink.textContent = "";
+
+    async function success(position) {
+        const latitude = position.coords.latitude;
+        const longitude = position.coords.longitude;
+
+        status.textContent = "";
+        mapLink.href = `https://www.openstreetmap.org/#map=18/${latitude}/${longitude}`;
+        mapLink.textContent = `Latitude: ${latitude} °, Longitude: ${longitude} °`;
+
+        let JSON = await ((await fetch("https://api.openweathermap.org/data/2.5/weather?lat=" + latitude + "&lon=" + longitude + "&appid=" + apiKey + getUnits())).json())
+        //console.log(JSON)
+        //console.log("JSON.name:" + JSON.name)
+        searchByLatLong(latitude, longitude)
+    }
+
+    function error() {
+        status.textContent = "Unable to retrieve your location";
+    }
+
+    if (!navigator.geolocation) {
+        status.textContent = "Geolocation is not supported by your browser";
+    }else{
+        navigator.geolocation.getCurrentPosition(success, error);
+    }
+
 
 })
 
@@ -86,7 +122,7 @@ addFavButton.addEventListener("click", () => {
         favs.push(searchArea.value)
         p.addEventListener("click", () => {
             searchArea.value = p.innerText
-            search(searchArea.value, getUnits)
+            searchByCityName(searchArea.value)
         })
     }
     else {
@@ -95,20 +131,29 @@ addFavButton.addEventListener("click", () => {
 
 })
 
-const search = async(searchTerm) => {
+const searchByCityName = async (searchTerm) => {
     //console.log(searchTerm)
-    document.getElementById("city").innerText = searchTerm
-    console.log("Searching for " + searchTerm)
+    searchArea.value = searchTerm
 
-    let JSON = await ((await fetch("https://api.openweathermap.org/data/2.5/weather?q=" + searchTerm +"&appid=" + apiKey + getUnits())).json())
+    let JSON = await ((await fetch("https://api.openweathermap.org/data/2.5/weather?q=" + searchTerm + "&appid=" + apiKey + getUnits())).json())
     console.log(JSON)
+    console.log("Searching for " + JSON.name)
+    document.getElementById("city").innerText = JSON.name
+    let countryCode = JSON.sys.country
+    document.getElementById("country").innerText = countryCode
 
     let mainWeatherDescr = JSON.weather[0].description
     let mainWeather = JSON.weather[0].main
     let feelsLike = JSON.main.feels_like
     let humidity = JSON.main.humidity
     let pressure = JSON.main.pressure
-    let visibility = JSON.sys.visibility
+    let visibility = JSON.visibility / 1000
+
+    document.getElementById("main-description").innerText = mainWeather
+    document.getElementById("feels-like").innerText = "Feels like " + feelsLike + selector.value
+    document.getElementById("humidity").innerText = "Humidity: " + humidity + "%"
+    document.getElementById("pressure").innerText = "Pressure: " + pressure + "hPa"
+    document.getElementById("visibility").innerText = "Visbility: " + visibility + "km"
 
 
     let windDegree = JSON.wind.deg
@@ -121,7 +166,42 @@ const search = async(searchTerm) => {
 
 }
 
-async function createChart () {
+const searchByLatLong = async (latitude, longitude) => {
+    //console.log(searchTerm)
+
+    let JSON = await ((await fetch("https://api.openweathermap.org/data/2.5/weather?lat=" + latitude + "&lon=" + longitude + "&appid=" + apiKey + getUnits())).json())
+    console.log(JSON)
+    searchArea.value = JSON.name
+    let countryCode = JSON.sys.country
+    document.getElementById("city").innerText = JSON.name
+    document.getElementById("country").innerText = countryCode
+    console.log("Found " + JSON.name + " with latitude " + latitude + " and longitude " + longitude)
+
+    let mainWeatherDescr = JSON.weather[0].description
+    let mainWeather = JSON.weather[0].main
+    let feelsLike = JSON.main.feels_like
+    let humidity = JSON.main.humidity
+    let pressure = JSON.main.pressure
+    let visibility = JSON.visibility
+
+    document.getElementById("main-description").innerText = mainWeather
+    document.getElementById("feels-like").innerText = feelsLike + selector.value
+    document.getElementById("humidity").innerText = humidity
+    document.getElementById("pressure").innerText = pressure
+    document.getElementById("visibility").innerText = visibility + "m"
+
+
+    let windDegree = JSON.wind.deg
+    let windSpeed = JSON.wind.speed
+
+    document.getElementById("temperature").innerText = JSON.main.temp + selector.value
+
+    createChart()
+    getWeeklyForecast(7)
+
+}
+
+async function createChart() {
 
     const url = "https://pro.openweathermap.org/data/2.5/forecast/hourly?q=" + searchArea.value + "&appid=" + apiKey + getUnits()
     console.log(url)
@@ -129,16 +209,39 @@ async function createChart () {
     console.log(hourlyJSON)
 
     console.log(hourlyJSON.list[0].main.temp)
-    console.log(hourlyJSON.list[0].dt_text)
+    console.log(hourlyJSON.list[0].dt_txt)
+
+    //get data with current hour + 1 
+    const date = new Date();
+    let diffInHours = hourlyJSON.city.timezone / 3600
+    //console.log(date.getUTCHours())
+    //console.log(diffInHours)
+    const hour = date.getUTCHours() + diffInHours
+    console.log(hour)
 
     let owmHourlyValues = []
-    for(let i = 0; i < 24; i++){
-        owmHourlyValues.push(hourlyJSON.list[i].main.temp)
+    let owmHourlyLabels = []
+
+    let startIndex;
+
+    for(let i = 0; i < hourlyJSON.list.length; i++){
+        //console.log(i + ":   hour = " + hour + ", parseInt(hourlyJSON.list[i].dt_txt.substring(10,13)) = " + parseInt(hourlyJSON.list[i].dt_txt.substring(10,13)))
+        if((hour + 1 ) == parseInt(hourlyJSON.list[i].dt_txt.substring(10,13))){
+            startIndex = i;
+            break;
+        }
     }
+    console.log(startIndex)
+    for (let i = startIndex; i < startIndex + 24; i++) {
+       owmHourlyValues.push(hourlyJSON.list[i].main.temp)
+       owmHourlyLabels.push(hourlyJSON.list[i].dt_txt.substring(10,13))
+    }
+
     console.log(owmHourlyValues)
+    console.log(owmHourlyLabels)
 
     const hourlyChartData = {
-        labels: [7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19, 20, 21, 22, 23, 0, 1, 2, 3, 4, 5, 6],
+        labels: owmHourlyLabels,
         datasets: [
             {
                 name: "Open Weather Map API",
@@ -160,24 +263,24 @@ async function createChart () {
 
 }
 
-const getWeeklyForecast = async(numberOfDays) => {
-    while(weeklyDiv.lastElementChild){
-        weeklyDiv.removeChild(lastElementChild)
+const getWeeklyForecast = async (numberOfDays) => {
+    while (weeklyDiv.lastElementChild) {
+        weeklyDiv.removeChild(weeklyDiv.lastElementChild)
     }
-
+    console.log(getUnits())
     url = "https://api.openweathermap.org/data/2.5/forecast/daily?q=" + searchArea.value + "&cnt=" + numberOfDays + "&appid=" + apiKey + getUnits()
     console.log(url)
-    const weeklyJSON = await((await fetch(url)).json())
+    const weeklyJSON = await ((await fetch(url)).json())
     console.log(weeklyJSON)
 
-    for(let i = 0; i < weeklyJSON.list.length; i++){
+    for (let i = 0; i < weeklyJSON.list.length; i++) {
         const dayWidgetDiv = document.createElement("div")
         const dayDiv = document.createElement("div")
-        dayDiv.innerText = weeklyJSON.list[i].temp.day + selector.value
+        dayDiv.innerText = "Day " + (i + 1) + ": " + weeklyJSON.list[i].temp.day + selector.value
         const minDiv = document.createElement("div")
-        minDiv.innerText = weeklyJSON.list[i].temp.min  + selector.value
+        minDiv.innerText = "Min: " + weeklyJSON.list[i].temp.min + selector.value
         const maxDiv = document.createElement("div")
-        maxDiv.innerText = weeklyJSON.list[i].temp.max  + selector.value
+        maxDiv.innerText = "Max: " + weeklyJSON.list[i].temp.max + selector.value
 
         dayWidgetDiv.appendChild(dayDiv)
         dayWidgetDiv.appendChild(minDiv)
@@ -185,9 +288,10 @@ const getWeeklyForecast = async(numberOfDays) => {
 
         weeklyDiv.appendChild(dayWidgetDiv)
     }
-    
+
 
 }
+
 /*
 let map, infoWindow;
 //source: https://developers.google.com/maps/documentation/javascript/geolocation#maps_map_geolocation-javascript 
