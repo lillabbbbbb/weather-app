@@ -6,6 +6,8 @@ const addFavButton = document.getElementById("add-favorite")
 const favDiv = document.getElementById("favorites")
 const lastVisitedDiv = document.getElementById("last-visited")
 const selector = document.getElementById("select-metrics")
+const weatherDataSelector = document.getElementById("select-weather-data")
+const chartProviderSelector = document.getElementById("select-provider-chart")
 const weeklyDiv = document.getElementById("div-weekly")
 
 const apiKey1 = "d84bd23391e17b943fc45b049bd574d4"
@@ -19,6 +21,23 @@ const KELVIN = "K"
 let units = getUnits()
 let map;
 
+let data = {
+    api1: {
+        current: [],
+        hourlyForecast: [],
+        dailyForecast: []
+    },
+    api2: {
+        current: [],
+        hourlyForecast: [],
+        dailyForecast: []
+    },
+    api3: {
+        current: [],
+        hourlyForecast: [],
+        dailyForecast: []
+    }
+}
 
 let favs = []
 let lastVisited = []
@@ -26,6 +45,7 @@ let lastVisited = []
 let iconPaths = {
 
 }
+
 
 function getUnits() {
     let units = selector.value
@@ -140,8 +160,10 @@ const addToLastVisited = (cityName) => {
     console.log("this method is called")
     //check if the current search is not already in the last visited list
     if(lastVisited.includes(cityName)) {
-        lastVisitedDiv.removeChild(lastVisitedDiv.childNodes[lastVisited.indexOf(cityName)])
-        lastVisited.unshift(cityName)
+        console.log("Removing " + cityName + " from last visited")
+        lastVisitedDiv.removeChild(lastVisitedDiv.childNodes[lastVisited.indexOf(cityName) + 1])
+        lastVisited.pop(cityName)
+        console.log(lastVisited)
     }
     
     console.log("Adding " + cityName + " to last visited")
@@ -152,7 +174,8 @@ const addToLastVisited = (cityName) => {
             style: "cursor: pointer"
         })
         p.innerText = cityName
-        lastVisitedDiv.appendChild(p)
+        lastVisited.unshift(cityName)
+        lastVisitedDiv.insertBefore(p, lastVisitedDiv.childNodes[1])
         p.addEventListener("click", () => {
             searchArea.value = p.innerText
             searchByCityName(searchArea.value)
@@ -163,17 +186,29 @@ const addToLastVisited = (cityName) => {
 const searchByCityName = async (searchTerm) => {
     //console.log(searchTerm)
 
+
+    //Fetch first API 
     let JSON = await ((await fetch("https://api.openweathermap.org/data/2.5/weather?q=" + searchTerm + "&appid=" + apiKey1 + getUnits())).json())
     console.log(JSON)
     console.log("Searching for " + JSON.name)
-    document.getElementById("city").innerText = JSON.name
+
+
+    document.getElementById("city").innerText = JSON.name + ", " + JSON.sys.country
+    document.getElementById("unit").innerText = selector.value
     addToLastVisited(JSON.name)
     searchArea.value = JSON.name
-    let countryCode = JSON.sys.country
-    document.getElementById("country").innerText = countryCode
+    //let countryCode = JSON.sys.country
+    //document.getElementById("country").innerText = countryCode
 
     currentIconImg.src = loadMyIcon(JSON.weather[0].description)
     currentIconImg.setAttribute("class", "current-icon")
+
+    //set relevant theme
+    const body = document.getElementsByTagName("body")
+    body[0].setAttribute("class", setTheme(JSON.weather[0].description))
+
+
+
 
     //const date = new Date();
     let diffInHours = JSON.timezone / 3600
@@ -215,6 +250,8 @@ const searchByCityName = async (searchTerm) => {
     formattedSunset = date.getHours() + ':' + minutes.substr(-2)
     console.log(formattedSunset);
 
+
+
     let mainWeatherDescr = JSON.weather[0].description
     let mainWeather = JSON.weather[0].main
     let feelsLike = JSON.main.feels_like
@@ -230,15 +267,14 @@ const searchByCityName = async (searchTerm) => {
     document.getElementById("pressure").innerText = "Pressure: " + pressure + "hPa"
     document.getElementById("visibility").innerText = "Visibility: " + visibility + "km"
 
-
-
     let windDegree = JSON.wind.deg
     let windSpeed = JSON.wind.speed
 
     document.getElementById("wind-deg").innerText = "Wind degree: " + windDegree + "°"
     document.getElementById("wind-speed").innerText = "Wind speed: " + windSpeed + "km/h"
 
-    document.getElementById("temperature").innerText = JSON.main.temp + selector.value
+    document.getElementById("temperature").innerText = JSON.main.temp
+
 
     createChart()
     getWeeklyForecast(7)
@@ -602,6 +638,52 @@ const loadMyIcon2 = (description, temperature, time) => {
 
 
     return iconPath
+}
+
+//sets matching color theme (through setting CSS classes to HTML tags) based on the current weather
+const setTheme = (description) => {
+
+    let themeClasses = {
+        "sky is clear": "sunny",
+        "few clouds": "cloudy",
+        "scattered clouds": "cloudy",
+        "overcast clouds": "cloudy",
+        "broken clouds": "assets/cloud_sun.png",
+        "shower rain": "sunny-rainy",
+        "rain": "rainy-cloudy",
+        "moderate rain": "rainy-cloudy",
+        "light rain": "rainy-cloudy",
+        "thunderstorm": "stormy",
+        "snow": "snowy",
+        "mist": "cloudy",
+
+    }
+
+    let className;
+
+    for (let [key, value] of Object.entries(themeClasses)) {
+        console.log(`${key}: ${value}`);
+        console.log("Description: " + description)
+        if (description == key) {
+            className = value
+            console.log(className)
+            break
+        }
+        console.log("Suitable icon not found.")
+    }
+
+    //check for hot temperature
+    /*
+    const HOT_TEMP_CELS = 35
+    const HOT_TEMP_FAHR = HOT_TEMP_CELS * (9 / 5) + 32
+    const HOT_TEMP_KELV = HOT_TEMP_CELS + 273.15
+    if ((selector.value == CELSIUS && temperature >= HOT_TEMP_CELS) || (selector.value == FAHRENHEIT && temperature >= HOT_TEMP_FAHR) || (selector.value == KELVIN && temperature >= HOT_TEMP_KELV)) {
+        className = "hot-sunny"
+    }
+    */
+
+
+    return className
 }
 
 const loadOWMIcon = (description) => {

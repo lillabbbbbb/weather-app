@@ -1,9 +1,10 @@
 :root {
     --main-color: #f0e06dd8;
-    --main-background-color: linear-gradient(120deg, #ffe209, #0000ff);
+    --main-background-color: linear-gradient(45deg, #e0a70b 40%, #47a3ce);
+    --card-background: rgba(54, 38, 38, 0.5);
     --main-border-color: #000000ff;
     --main-margin: 10px;
-    --main-border-radius: 15px;
+    --main-border-radius: 25px;
     --main-padding: 10px
 }
 
@@ -38,7 +39,7 @@ body {
     font-family: Bahnschrift, 'DIN Alternate', 'Franklin Gothic Medium', 'Nimbus Sans Narrow', sans-serif-condensed, sans-serif;
     font-weight: normal;
     max-width: auto;
-    background-color: #99cc99;
+    background: var(--main-background-color);
 }
 
 footer {
@@ -100,22 +101,8 @@ input {
 #country {
     display: flex;
 }
-
-tr {
-    height: 1.5rem;
-}
-
-th {
-    width: 8rem;
-    font-family: 'Courier New', Courier, monospace;
-}
-
-td {
-    text-align: center;
-}
-
 .card-div {
-    background-color: rgba(54, 38, 38, 0.3);
+    background-color: var(--card-background);
     border-radius: var(--main-border-radius);
     margin: 10px;
     padding-top: var(--main-padding);
@@ -123,6 +110,53 @@ td {
     border: thin;
     border-color: black;
 }
+
+#current-icon
+
+/*Source: https://github.com/AsmrProg-YT/100-days-of-javascript/blob/master/Day%20%2310%20-%20Weather%20App/style.css */
+#weather-summary{
+    width: 100%;
+    display: flex;
+    justify-content: space-between;
+    margin-top: 30px;
+}
+
+#weather-summary #wind-speed, .weather-summary #humidity, .weather-summary #pressure{
+    width: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    height: 100px;
+}
+#weather-summary #humidity{
+    padding-left: 20px;
+    justify-content: flex-start;
+}
+
+#weather-summary #wind-speed{
+    padding-right: 20px;
+    justify-content: flex-end;
+}
+
+.weather-summary i{
+    color: #06283D;
+    font-size: 26px;
+    margin-right: 10px;
+    margin-top: 6px;
+}
+
+#weather-summary span{
+    color: #06283D;
+    font-size: 22px;
+    font-weight: 500;
+}
+
+#weather-summary p{
+    color: #06283D;
+    font-size: 14px;
+    font-weight: 500;
+}
+
 
 .daily-f-card-div {
     background-color: var(--main-color);
@@ -147,8 +181,10 @@ td {
     height: 70px;
 }
 
-.current-icon {
+#current-icon {
     height: 150px;
+    margin: 50px;
+    align-items: center;
 }
 .daily-icon {
     height: 80px;
@@ -164,16 +200,14 @@ td {
     background-color: linear-gradient(130deg, orange, red);
 }
 
+.sunny-rainy {
+
+}
+
 .hot-rainy {}
 
 .rainy-cloudy {
-    body {
-        background-color: linear-gradient(130deg, #abceeb, rgb(93, 175, 243));
-    }
-
-    button {
-        background-color: linear-gradient(180deg, #abceeb, rgb(93, 175, 243));
-    }
+    background-color: linear-gradient(130deg, #abceeb, rgb(93, 175, 243));
 }
 
 .cloudy {
