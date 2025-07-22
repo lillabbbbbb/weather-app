@@ -4,6 +4,7 @@ const locationButton = document.getElementById("geolocation");
 const currentIconImg = document.getElementById("current-icon")
 const addFavButton = document.getElementById("add-favorite")
 const favDiv = document.getElementById("favorites")
+const lastVisitedDiv = document.getElementById("last-visited")
 const selector = document.getElementById("select-metrics")
 const weeklyDiv = document.getElementById("div-weekly")
 
@@ -135,6 +136,30 @@ addFavButton.addEventListener("click", () => {
 
 })
 
+const addToLastVisited = (cityName) => {
+    console.log("this method is called")
+    //check if the current search is not already in the last visited list
+    if(lastVisited.includes(cityName)) {
+        lastVisitedDiv.removeChild(lastVisitedDiv.childNodes[lastVisited.indexOf(cityName)])
+        lastVisited.unshift(cityName)
+    }
+    
+    console.log("Adding " + cityName + " to last visited")
+        let p = document.createElement("p")
+        Object.assign(p, {
+            role: "button",
+            tabIndex: 0,
+            style: "cursor: pointer"
+        })
+        p.innerText = cityName
+        lastVisitedDiv.appendChild(p)
+        p.addEventListener("click", () => {
+            searchArea.value = p.innerText
+            searchByCityName(searchArea.value)
+        })
+
+}
+
 const searchByCityName = async (searchTerm) => {
     //console.log(searchTerm)
 
@@ -142,6 +167,7 @@ const searchByCityName = async (searchTerm) => {
     console.log(JSON)
     console.log("Searching for " + JSON.name)
     document.getElementById("city").innerText = JSON.name
+    addToLastVisited(JSON.name)
     searchArea.value = JSON.name
     let countryCode = JSON.sys.country
     document.getElementById("country").innerText = countryCode
@@ -441,6 +467,7 @@ const getWeeklyForecast = async (numberOfDays) => {
 
         const icon = document.createElement("img")
         icon.src = loadMyIcon2(weeklyJSON.list[i].weather[0].description)
+        icon.setAttribute("class", "daily-icon")
         const p = document.createElement("p")
         p.innerText = weeklyJSON.list[i].weather[0].description
 
@@ -485,6 +512,7 @@ const getWeeklyForecast = async (numberOfDays) => {
 
         const icon = document.createElement("img")
         icon.src = loadMyIcon2(weeklyJSON.list[i].weather[0].description)
+        icon.setAttribute("class", "daily-icon")
         const p = document.createElement("p")
         p.innerText = weeklyJSON.list[i].weather[0].description
 

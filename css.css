@@ -139,6 +139,10 @@ td {
     border-radius: var(--main-border-radius);
 }
 
+#hourly-chart {
+    margin: 0;
+}
+
 .page-icon {
     height: 70px;
 }
@@ -192,5 +196,5 @@ td {
 
 @media (min-width: 1100px) {
     /*Layout for desktops*/
-
+    
 }

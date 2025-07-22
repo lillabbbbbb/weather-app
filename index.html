@@ -57,53 +57,52 @@
         <p id="status"></p>
     </header>
     <main>
-        <div class="text-center">
+        <div class="flex-grow-1 row rounded-2 main-col-div">
+            <section class=" border p-2 card-div">
 
-            <div class="flex-grow-1 row rounded-2 ">
-                <section class=" border p-2 card-div">
+                <div id="favorites">Favorites:
+                </div>
+                <div id="last-visited">Last visited:</div>
 
-                    <div id="favorites">Favorites:
-                    </div>
-                    <div>Last visited:</div>
+        </div>
+        <section class="flex-grow-1 p-2 mb-2 main-col-div">
+            <div class="card-div">
+                <p id="city">City</p>
+                <p id="country">Country</p>
+                <div><img id="current-icon" src="" alt=""></div>
+                <p id="temperature"></p>
+                <div id="weather-summary"></div>
+                <p id="main-description"></p>
+                <p id="feels-like"></p>
+                <p id="sunrise"></p>
+                <p id="sunset"></p>
+                <p id="humidity"></p>
+                <p id="pressure"></p>
+                <p id="visibility"></p>
+                <p id="wind-deg"></p>
+                <p id="wind-speed"></p>
+            </div>
+        </section>
+        <input type="range" id="year-slider" min="1990" max="2024" value="2024" step="1">
+        <button id="add-favorite">Favorite</button>
+        <select id="select-metrics">
+            <option selected value="℃">Celsius</option>
+            <option value="°F">Fahrenheit</option>
+            <option value="K">Kelvin</option>
+        </select>
+        <div class="card-div">
+            Temperature forecast for the next 24 hours
+            <div id="hourly-chart"></div>
+        </div>
+        <div class="card-div">
+            Next 7 days</p>
+            <div id="div-weekly" class="card-div row">
 
             </div>
-
-            <section class="flex-grow-1 p-2 mb-2">
-                <div class="card-div">
-                    <p id="city">City</p>
-                    <p id="country">Country</p>
-                    <div><img id="current-icon" src="" alt=""></div>
-                    <p id="temperature"></p>
-                    <div id="weather-summary"></div>
-                    <p id="main-description"></p>
-                    <p id="feels-like"></p>
-                    <p id="sunrise"></p>
-                    <p id="sunset"></p>
-                    <p id="humidity"></p>
-                    <p id="pressure"></p>
-                    <p id="visibility"></p>
-                    <p id="wind-deg"></p>
-                    <p id="wind-speed"></p>
-                </div>
-                <button id="add-favorite">Favorite</button>
-                <select id="select-metrics">
-                    <option selected value="℃">Celsius</option>
-                    <option value="°F">Fahrenheit</option>
-                    <option value="K">Kelvin</option>
-                </select>
-                <div class="card-div">
-                    Temperature forecast for the next 24 hours
-                    <div id="hourly-chart"></div>
-                </div>
-                <div class="card-div">
-                    Next 7 days</p>
-                    <div id="div-weekly" class="card-div row">
-
-                    </div>
-                </div>
+        </div>
         </div>
 
-        <aside class="flex-grow-1 mb-2 card-div">
+        <aside class="flex-grow-1 mb-2 card-div main-col-div">
             <div class="card-div" id="warnings">Warning!
                 Lorem, ipsum dolor sit amet consectetur adipisicing elit. Quas quisquam id vero, eius natus
                 similique omnis corrupti ipsam accusamus quo dolor deleniti temporibus eligendi, laboriosam
@@ -114,6 +113,7 @@
             </div>
             </div>
             </div>
+        </aside>
     </main>
     <footer>
         <p>Weather icons from <a href="https://www.flaticon.com/authors/freepik">FreePik at Flaticon</a></p>
