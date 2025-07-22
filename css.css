@@ -1,44 +1,68 @@
-:root{
-    --main-color: #ffe209;
-    --main-background-color: linear-gradient(120deg, #ffe209,#0000ff)
+:root {
+    --main-color: #f0e06dd8;
+    --main-background-color: linear-gradient(120deg, #ffe209, #0000ff);
+    --main-border-color: #000000ff;
+    --main-margin: 10px;
+    --main-border-radius: 15px;
+    --main-padding: 10px
 }
 
-#map { height: 800px; }
+/*Values that are common for all screens, most importantly mobile phones*/
+
+#map {
+    height: 800px;
+}
 
 html {
     margin: 30;
-    padding: 20px;
+    padding: var(--main-padding);
     background-color: black;
 }
+
 h1 {
     display: inline-flex;
 }
+
 input.text {
     display: flex;
 }
+
 #header-div {
     background: var(--main-background-color);
 
 }
-html, body{
+
+html,
+body {
     text-align: center;
     font-family: Bahnschrift, 'DIN Alternate', 'Franklin Gothic Medium', 'Nimbus Sans Narrow', sans-serif-condensed, sans-serif;
-font-weight: normal;
-    background: linear-gradient(120deg, #0000ff,red)
+    font-weight: normal;
+    max-width: auto;
+    background-color: #99cc99;
 }
 
-h1, table {
+footer {
+    background-color: #000000;
+}
+
+main div {
+    padding: var(--main-padding);
+}
+
+h1,
+table {
     size: 2rem;
     margin: 20px;
-    border-radius: 10px;
+    border-radius: var(--main-border-radius);
     border: thin;
     border-color: black;
 
 }
 
-button, select {
-    background-color: linear-gradient(90deg, #ffe209,#0000ff);
-    border-radius: 0.5rem;
+button,
+select {
+    background-color: rgb(204, 255, 245);
+    border-radius: var(--main-border-radius);
     margin-top: 10px;
     margin-bottom: 10px;
     padding: 0.4rem;
@@ -47,34 +71,36 @@ button, select {
     font-family: 'Courier New', Courier, monospace;
 }
 
+button:hover, select:hover {
+    background-color: #f0e06dd8;
+}
+
 input {
     border-color: var(--main-color);
-    border-radius: 0.5rem;
+    border-radius: var(--main-border-radius);
     display: block;
     margin: 0 auto;
     margin-top: 5px;
 }
 
-img {
-    height: 70px;
-}
-img, h1 {
 
-}
-
-#current-icon{
+#current-icon {
     height: 150px;
     float: left;
     margin: 30px;
 }
-#temperature{
+
+#temperature {
     font-size: 40px;
     text-align: left;
-    vertical-align:middle;
+    vertical-align: middle;
 }
-#city, #country{
+
+#city,
+#country {
     display: flex;
 }
+
 tr {
     height: 1.5rem;
 }
@@ -87,52 +113,84 @@ th {
 td {
     text-align: center;
 }
+
 .card-div {
-    background-color: white;
-    border-radius: 10px;
+    background-color: rgba(54, 38, 38, 0.3);
+    border-radius: var(--main-border-radius);
     margin: 10px;
-    padding-top: 10px;
-    padding-bottom: 10px;
+    padding-top: var(--main-padding);
+    padding-bottom: var(--main-padding);
     border: thin;
     border-color: black;
-
 }
 
 .daily-f-card-div {
     background-color: var(--main-color);
-    border-radius: 10px;
+    border-radius: var(--main-border-radius);
     margin: 0px 0px 10px 0px;
-    padding-top: 10px;
-    padding-bottom: 10px;
+    padding-top: var(--main-padding);
+    padding-bottom: var(--main-padding);
     border: thin;
     border-color: black;
 
 }
 
 #map {
-    border-radius: 10px;
+    border-radius: var(--main-border-radius);
+}
+
+.page-icon {
+    height: 70px;
+}
+
+.current-icon {
+    height: 150px;
+}
+.daily-icon {
+    height: 80px;
+}
+
+
+.sunny {
+    background-color: linear-gradient(130deg, #47e8eed8, orange);
+
+}
+
+.hot-sunny {
+    background-color: linear-gradient(130deg, orange, red);
+}
+
+.hot-rainy {}
+
+.rainy-cloudy {
+    body {
+        background-color: linear-gradient(130deg, #abceeb, rgb(93, 175, 243));
+    }
+
+    button {
+        background-color: linear-gradient(180deg, #abceeb, rgb(93, 175, 243));
+    }
+}
+
+.cloudy {
+    background-color: linear-gradient(130deg, #abceeb, rgb(138, 176, 207));
+}
+
+.snowy {
+    background-color: linear-gradient(130deg, #abceeb, rgb(231, 237, 241));
+}
+
+.stormy {
+    background-color: linear-gradient(130deg, #577496, rgb(138, 176, 207));
+}
+
+
+@media (min-width: 480px) {
+    /*Layout or tablets*/
+
 }
 
 @media (min-width: 1100px) {
-    body {
-        max-width: auto ;
-        background-color: #99cc99;
-        margin: auto;
-    }
+    /*Layout for desktops*/
 
-    .main-menu ul {
-        display: flex;
-    }
-
-    main {
-        display: flex;
-    }
-
-    main section {
-        max-width: 700px;
-    }
-    
-    main aside {
-        max-width: 300px;
-    }
 }

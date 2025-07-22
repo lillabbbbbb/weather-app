@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="en" class="sunny">
 
 <head>
     <meta charset="UTF-8">
@@ -17,12 +17,10 @@
     <script type="text/javascript" src="https://maps.googleapis.com/maps/api/js?sensor=false"></script>
     <!--Importing Leaflet-->
     <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css"
-     integrity="sha256-p4NxAoJBhIIN+hmNHrzRCf9tD/miZyoHS5obTRR9BMY="
-     crossorigin=""/>
+        integrity="sha256-p4NxAoJBhIIN+hmNHrzRCf9tD/miZyoHS5obTRR9BMY=" crossorigin="" />
     <!-- Make sure you put this AFTER Leaflet's CSS -->
     <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"
-     integrity="sha256-20nQCchB9co0qIjJZRGuk2/Z9VM+kNiyxNV1lvTlZBo="
-     crossorigin=""></script>
+        integrity="sha256-20nQCchB9co0qIjJZRGuk2/Z9VM+kNiyxNV1lvTlZBo=" crossorigin=""></script>
     <script src="index.js" defer></script>
     <link rel="stylesheet" href="css.css">
     <title>Weather App</title>
@@ -30,9 +28,26 @@
 
 <body>
     <header>
-        <div id="header-div">
-            <img src="assets/meteorology.png" alt="">
+        <div id="header-div" class="sunny">
+            <img src="assets/meteorology.png" alt="" class="page-icon">
             <h1>SÄÄ!</h1>
+            <nav class="navbar navbar-expand-lg bg-light">
+                <a class="navbar-brand" href="#"></a>
+                <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav"
+                    aria-controls="navbarNav" aria-expanded="false" aria-label="Toggle navigation">
+                    <span class="navbar-toggler-icon"></span>
+                </button>
+                <div class="collapse navbar-collapse" id="navbarNav">
+                    <div class="navbar-nav">
+                        <p>Advanced options</p>
+                        <a class="nav-link" href="#">Advanced search</a>
+                        <a class="nav-link" href="#">Forecast days</a>
+                        <a class="nav-link" href="#">Menu item 3</a>
+                        <a class="nav-link" href="#">Menu item 4</a>
+                    </div>
+                </div>
+            </nav>
+
         </div>
         <form action="submit">
             <input type="text" id="search-bar" placeholder="e.g. Kouvola">
@@ -42,60 +57,63 @@
         <p id="status"></p>
     </header>
     <main>
-        <div class="container text-center ">
+        <div class="text-center">
 
             <div class="flex-grow-1 row rounded-2 ">
-                <div class="col-2 border border-success p-2 mb-2 card-div">
+                <section class=" border p-2 card-div">
 
                     <div id="favorites">Favorites:
                     </div>
                     <div>Last visited:</div>
 
-                </div>
-
-                <div class="flex-grow-1 col-7 bg-primary-subtle border border-success p-2 mb-2 card-div">
-                    <div class="card-div">
-                        <p id="city">City</p>
-                        <p id="country">Country</p>
-                        <div><img id="current-icon" src="" alt=""></div>
-                        <p id="temperature"></p>
-                        <div id="weather-summary"></div>
-                        <p id="main-description"></p>
-                        <p id="feels-like"></p>
-                        <p id="sunrise"></p>
-                        <p id="sunset"></p>
-                        <p id="humidity"></p>
-                        <p id="pressure"></p>
-                        <p id="visibility"></p>
-                        <p id="wind-deg"></p>
-                        <p id="wind-speed"></p>
-                    </div>
-                    <button id="add-favorite">Favorite</button>
-                    <select id="select-metrics">
-                        <option selected value="℃">Celsius</option>
-                        <option value="°F">Fahrenheit</option>
-                        <option value="K">Kelvin</option>
-                    </select>
-                    <div class="card-div">
-                        Temperature forecast for the next 24 hours
-                        <div id="hourly-chart"></div>
-                    </div>
-                    <div id="div-weekly" class="card-div row">Next 7 days
-
-                    </div>
-                </div>
-
-                <aside class="flex-grow-1 col-2 border border-success p-4 mb-2 card-div">
-                    <div class="card-div" id="warnings">Warning!
-                        Lorem, ipsum dolor sit amet consectetur adipisicing elit. Quas quisquam id vero, eius natus
-                        similique omnis corrupti ipsam accusamus quo dolor deleniti temporibus eligendi, laboriosam
-                        in
-                        blanditiis itaque impedit iste.
-                        </div>
-                    <div id="map"></div>
-                </div>
             </div>
+
+            <section class="flex-grow-1 p-2 mb-2">
+                <div class="card-div">
+                    <p id="city">City</p>
+                    <p id="country">Country</p>
+                    <div><img id="current-icon" src="" alt=""></div>
+                    <p id="temperature"></p>
+                    <div id="weather-summary"></div>
+                    <p id="main-description"></p>
+                    <p id="feels-like"></p>
+                    <p id="sunrise"></p>
+                    <p id="sunset"></p>
+                    <p id="humidity"></p>
+                    <p id="pressure"></p>
+                    <p id="visibility"></p>
+                    <p id="wind-deg"></p>
+                    <p id="wind-speed"></p>
+                </div>
+                <button id="add-favorite">Favorite</button>
+                <select id="select-metrics">
+                    <option selected value="℃">Celsius</option>
+                    <option value="°F">Fahrenheit</option>
+                    <option value="K">Kelvin</option>
+                </select>
+                <div class="card-div">
+                    Temperature forecast for the next 24 hours
+                    <div id="hourly-chart"></div>
+                </div>
+                <div class="card-div">
+                    Next 7 days</p>
+                    <div id="div-weekly" class="card-div row">
+
+                    </div>
+                </div>
         </div>
+
+        <aside class="flex-grow-1 mb-2 card-div">
+            <div class="card-div" id="warnings">Warning!
+                Lorem, ipsum dolor sit amet consectetur adipisicing elit. Quas quisquam id vero, eius natus
+                similique omnis corrupti ipsam accusamus quo dolor deleniti temporibus eligendi, laboriosam
+                in
+                blanditiis itaque impedit iste.
+            </div>
+            <div id="map"></div>
+            </div>
+            </div>
+            </div>
     </main>
     <footer>
         <p>Weather icons from <a href="https://www.flaticon.com/authors/freepik">FreePik at Flaticon</a></p>

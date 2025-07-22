@@ -147,6 +147,7 @@ const searchByCityName = async (searchTerm) => {
     document.getElementById("country").innerText = countryCode
 
     currentIconImg.src = loadMyIcon(JSON.weather[0].description)
+    currentIconImg.setAttribute("class", "current-icon")
 
     //const date = new Date();
     let diffInHours = JSON.timezone / 3600
@@ -407,6 +408,7 @@ const getWeeklyForecast = async (numberOfDays) => {
 
         const icon = document.createElement("img")
         icon.src = loadMyIcon2(weeklyJSON.list[i].weather[0].description)
+        icon.setAttribute("class", "daily-icon")
         const p = document.createElement("p")
         p.innerText = weeklyJSON.list[i].weather[0].description
 
