@@ -11,6 +11,10 @@ const apiKey1 = "d84bd23391e17b943fc45b049bd574d4"
 const apiKey2 = "Cgp1nINqRCsErUN8HM74lwRgOyAP0ulF"
 const apikey3 = ""
 
+const CELSIUS = "℃"
+const FAHRENHEIT = "°F"
+const KELVIN = "K"
+
 let units = getUnits()
 let map;
 
@@ -18,19 +22,19 @@ let map;
 let favs = []
 let lastVisited = []
 
-let icons = {
+let iconPaths = {
 
 }
 
 function getUnits() {
     let units = selector.value
-    if (units == "℃") {
+    if (units == CELSIUS) {
         units = "&units=metric"
     }
-    else if (units == "°F") {
+    else if (units == FAHRENHEIT) {
         units = "&units=imperial"
     }
-    else if (units == "K") {
+    else if (units == KELVIN) {
         units = "&units=default"
     }
     return units
@@ -144,6 +148,46 @@ const searchByCityName = async (searchTerm) => {
 
     currentIconImg.src = loadMyIcon(JSON.weather[0].description)
 
+    //const date = new Date();
+    let diffInHours = JSON.timezone / 3600
+    //console.log(date.getUTCHours())
+    //console.log(diffInHours)
+    //const hour = date.getUTCHours() + diffInHours
+
+    let sunrise = JSON.sys.sunrise
+    let sunset = JSON.sys.sunset
+
+    //Source: https://stackoverflow.com/questions/847185/convert-a-unix-timestamp-to-time-in-javascript
+    // Create a new JavaScript Date object based on the timestamp
+    // multiplied by 1000 so that the argument is in milliseconds, not seconds
+    var date = new Date(sunrise * 1000);
+
+    // Hours part from the timestamp
+    var hours = date.getUTCHours() + diffInHours;
+
+    // Minutes part from the timestamp
+    var minutes = "0" + date.getMinutes();
+
+    date.setHours(hours)
+
+    // Will display time in 10:30:23 format
+    formattedSunrise = date.getHours() + ':' + minutes.substr(-2)
+    console.log(formattedSunrise);
+
+    var date = new Date(sunset * 1000);
+
+    // Hours part from the timestamp
+    var hours = date.getUTCHours() + diffInHours;
+
+    // Minutes part from the timestamp
+    var minutes = "0" + date.getMinutes();
+
+    date.setHours(hours)
+
+    // Will display time in 10:30:23 format
+    formattedSunset = date.getHours() + ':' + minutes.substr(-2)
+    console.log(formattedSunset);
+
     let mainWeatherDescr = JSON.weather[0].description
     let mainWeather = JSON.weather[0].main
     let feelsLike = JSON.main.feels_like
@@ -153,9 +197,12 @@ const searchByCityName = async (searchTerm) => {
 
     document.getElementById("main-description").innerText = mainWeather
     document.getElementById("feels-like").innerText = "Feels like " + feelsLike + selector.value
+    document.getElementById("sunrise").innerText = "Sunrise: " + formattedSunrise
+    document.getElementById("sunset").innerText = "Sunset: " + formattedSunset
     document.getElementById("humidity").innerText = "Humidity: " + humidity + "%"
     document.getElementById("pressure").innerText = "Pressure: " + pressure + "hPa"
     document.getElementById("visibility").innerText = "Visibility: " + visibility + "km"
+
 
 
     let windDegree = JSON.wind.deg
@@ -298,12 +345,7 @@ async function createChart() {
     console.log(omHourlyJSON)
 
 
-
-
-    //build chart
-    const hourlyChartData = {
-        labels: owmHourlyLabels,
-        datasets: [
+    let datasets = [
             {
                 name: "Open Weather Map API",
                 values: owmHourlyValues
@@ -315,6 +357,15 @@ async function createChart() {
                 //values: tomHourlyValues
             }
         ]
+    //exclude 2nd API hourly values when the unit is Kelvin
+    if(selector.value == KELVIN){
+        datasets.pop()
+    }
+
+    //build chart
+    const hourlyChartData = {
+        labels: owmHourlyLabels,
+        datasets: datasets
     }
 
     const chart = new frappe.Chart("#hourly-chart", {
@@ -331,10 +382,18 @@ const getWeeklyForecast = async (numberOfDays) => {
         weeklyDiv.removeChild(weeklyDiv.lastElementChild)
     }
     console.log(getUnits())
+
+    //Fetch first API: Open Weather Map
     url1 = "https://api.openweathermap.org/data/2.5/forecast/daily?q=" + searchArea.value + "&cnt=" + numberOfDays + "&appid=" + apiKey1 + getUnits()
     console.log(url1)
     const weeklyJSON = await ((await fetch(url1)).json())
     console.log(weeklyJSON)
+
+    const h31 = document.createElement("h3")
+    h31.innerText = "OpenWeatherMap"
+    const api1Div = document.createElement("div")
+    api1Div.setAttribute("class","col")
+    api1Div.appendChild(h31)
 
     for (let i = 0; i < weeklyJSON.list.length; i++) {
         const dayWidgetDiv = document.createElement("div")
@@ -347,16 +406,95 @@ const getWeeklyForecast = async (numberOfDays) => {
         maxDiv.innerText = "Max: " + weeklyJSON.list[i].temp.max + selector.value
 
         const icon = document.createElement("img")
-        icon.src = loadOWMIcon(weeklyJSON.list[i].weather[0].description)
+        icon.src = loadMyIcon2(weeklyJSON.list[i].weather[0].description)
+        const p = document.createElement("p")
+        p.innerText = weeklyJSON.list[i].weather[0].description
 
         dayWidgetDiv.appendChild(icon)
+        dayWidgetDiv.appendChild(p)
+        dayWidgetDiv.appendChild(dayDiv)
+        dayWidgetDiv.appendChild(minDiv)
+        dayWidgetDiv.appendChild(maxDiv)
+
+        api1Div.appendChild(dayWidgetDiv)
+    }
+    weeklyDiv.appendChild(api1Div)
+
+    //This div data is just for testing, because Tomorrow API number of calls is very limited
+    const h32 = document.createElement("h3")
+    h32.innerText = "Fake Data"
+    const api2Div = document.createElement("div")
+    api2Div.setAttribute("class","col")
+    api2Div.appendChild(h32)
+
+    for (let i = 0; i < weeklyJSON.list.length; i++) {
+        const dayWidgetDiv = document.createElement("div")
+        dayWidgetDiv.setAttribute("class", "daily-f-card-div")
+        const dayDiv = document.createElement("div")
+        dayDiv.innerText = "Day " + (i + 1) + ": " + weeklyJSON.list[i].temp.day + selector.value
+        const minDiv = document.createElement("div")
+        minDiv.innerText = "Min: " + weeklyJSON.list[i].temp.min + selector.value
+        const maxDiv = document.createElement("div")
+        maxDiv.innerText = "Max: " + weeklyJSON.list[i].temp.max + selector.value
+
+        const icon = document.createElement("img")
+        icon.src = loadMyIcon2(weeklyJSON.list[i].weather[0].description)
+        const p = document.createElement("p")
+        p.innerText = weeklyJSON.list[i].weather[0].description
+
+        dayWidgetDiv.appendChild(icon)
+        dayWidgetDiv.appendChild(p)
+        dayWidgetDiv.appendChild(dayDiv)
+        dayWidgetDiv.appendChild(minDiv)
+        dayWidgetDiv.appendChild(maxDiv)
+
+        api2Div.appendChild(dayWidgetDiv)
+    }
+    weeklyDiv.appendChild(api2Div)
+
+
+    //Fetch Second API: Tomorrow IO API
+    /*
+    const url2 = "https://api.tomorrow.io/v4/weather/forecast?location=" + searchArea.value + "&timesteps=1d" + getUnits() + "&apikey=Cgp1nINqRCsErUN8HM74lwRgOyAP0ulF"
+    const tomDailyJSON = await( (await (fetch(url2))).json())
+    console.log(tomDailyJSON)
+
+
+    let tomDailyValues = []
+
+    console.log(tomDailyJSON.timelines.daily[0].values.temperatureAvg)
+    console.log(tomDailyJSON.timelines.daily[0].values.temperatureMin)
+    console.log(tomDailyJSON.timelines.daily[0].values.temperatureMax)
+
+    const h32 = document.createElement("h3")
+    h32.innerText = "Tomorrow API"
+    weeklyDiv.appendChild(h32)
+
+    
+    for (let i = 0; i < weeklyJSON.list.length; i++) {
+        const dayWidgetDiv = document.createElement("div")
+        dayWidgetDiv.setAttribute("class", "daily-f-card-div")
+        const dayDiv = document.createElement("div")
+        dayDiv.innerText = "Day " + (i + 1) + ": " + tomDailyJSON.timelines.daily[0].values.temperatureAvg + selector.value
+        const minDiv = document.createElement("div")
+        minDiv.innerText = "Min: " + tomDailyJSON.timelines.daily[0].values.temperatureMin + selector.value
+        const maxDiv = document.createElement("div")
+        maxDiv.innerText = "Max: " + tomDailyJSON.timelines.daily[0].values.temperatureMax + selector.value
+
+        const icon = document.createElement("img")
+        icon.src = loadMyIcon2(weeklyJSON.list[i].weather[0].description)
+        const p = document.createElement("p")
+        p.innerText = weeklyJSON.list[i].weather[0].description
+
+        dayWidgetDiv.appendChild(icon)
+        dayWidgetDiv.appendChild(p)
         dayWidgetDiv.appendChild(dayDiv)
         dayWidgetDiv.appendChild(minDiv)
         dayWidgetDiv.appendChild(maxDiv)
 
         weeklyDiv.appendChild(dayWidgetDiv)
     }
-
+    */
 
 }
 
@@ -390,6 +528,52 @@ const loadMyIcon = (description) => {
     }
 }
 
+/*
+    @time: time of the day in hours (e.g. 14)
+ */
+const loadMyIcon2 = (description, temperature, time) => {
+
+    iconPaths = {
+        "sky is clear": "assets/sun.png",
+        "few clouds": "assets/cloud_sun.png",
+        "scattered clouds": "assets/cloud.png",
+        "overcast clouds": "assets/cloud.png",
+        "broken clouds": "assets/cloud_sun.png",
+        "shower rain": "assets/cloud_rain_sun.png",
+        "rain": "assets/heavy_rain.png",
+        "moderate rain": "assets/heavy_rain.png",
+        "light rain": "assets/cloud_rain_sun.png",
+        "thunderstorm": "assets/storm",
+        "snow": "assets/snowflake.png",
+        "mist": "assets/mist.png",
+
+    }
+
+    let iconPath;
+
+    for (let [key, value] of Object.entries(iconPaths)) {
+        console.log(`${key}: ${value}`);
+        console.log("Description: " + description)
+        if (description == key) {
+            iconPath = value
+            console.log(key)
+            break
+        }
+        console.log("Suitable icon not found.")
+    }
+
+    //check for hot temperature
+    const HOT_TEMP_CELS = 35
+    const HOT_TEMP_FAHR = HOT_TEMP_CELS * (9 / 5) + 32
+    const HOT_TEMP_KELV = HOT_TEMP_CELS + 273.15
+    if ((selector.value == CELSIUS && temperature >= HOT_TEMP_CELS) || (selector.value == FAHRENHEIT && temperature >= HOT_TEMP_FAHR) || (selector.value == KELVIN && temperature >= HOT_TEMP_KELV)) {
+        iconPath = "assets/hot.png"
+    }
+
+
+    return iconPath
+}
+
 const loadOWMIcon = (description) => {
 
     iconCodes = {
@@ -410,7 +594,7 @@ const loadOWMIcon = (description) => {
     for (let [key, value] of Object.entries(iconCodes)) {
         console.log(`${key}: ${value}`);
         console.log(description)
-        if(description = key){
+        if (description = key) {
             code = value
             console.log(code)
             break
@@ -464,57 +648,3 @@ const loadMap = async (lat, lon) => {
     }
 
 }
-
-/*
-let map, infoWindow;
-//source: https://developers.google.com/maps/documentation/javascript/geolocation#maps_map_geolocation-javascript 
-function initMap() {
-    map = new google.maps.Map(document.getElementById("map"), {
-        center: { lat: -34.397, lng: 150.644 },
-        zoom: 6,
-    });
-    infoWindow = new google.maps.InfoWindow();
-
-
-    //locationButton.classList.add("custom-map-control-button");
-    //map.controls[google.maps.ControlPosition.TOP_CENTER].push(locationButton);
-
-    locationButton.addEventListener("click", () => {
-        // Try HTML5 geolocation.
-        if (navigator.geolocation) {
-            navigator.geolocation.getCurrentPosition(
-                (position) => {
-                    const pos = {
-                        lat: position.coords.latitude,
-                        lng: position.coords.longitude,
-                    };
-
-                    infoWindow.setPosition(pos);
-                    infoWindow.setContent("Location found.");
-                    infoWindow.open(map);
-                    map.setCenter(pos);
-                },
-                () => {
-                    handleLocationError(true, infoWindow, map.getCenter());
-                },
-            );
-        } else {
-            // Browser doesn't support Geolocation
-            handleLocationError(false, infoWindow, map.getCenter());
-        }
-    });
-}
-
-function handleLocationError(browserHasGeolocation, infoWindow, pos) {
-    infoWindow.setPosition(pos);
-    infoWindow.setContent(
-        browserHasGeolocation
-            ? "Error: The Geolocation service failed."
-            : "Error: Your browser doesn't support geolocation.",
-    );
-    infoWindow.open(map);
-}
-
-window.initMap = initMap;
-initMap()
-*/
