@@ -601,6 +601,7 @@ const loadMyIcon2 = (description, temperature, time) => {
 
     iconPaths = {
         "sky is clear": "assets/sun.png",
+        "clear sky": "assets/sun.png",
         "few clouds": "assets/cloud_sun.png",
         "scattered clouds": "assets/cloud.png",
         "overcast clouds": "assets/cloud.png",
@@ -618,11 +619,11 @@ const loadMyIcon2 = (description, temperature, time) => {
     let iconPath;
 
     for (let [key, value] of Object.entries(iconPaths)) {
-        console.log(`${key}: ${value}`);
-        console.log("Description: " + description)
+        //console.log(`${key}: ${value}`);
+        //console.log("Description: " + description)
         if (description == key) {
             iconPath = value
-            console.log(key)
+            //console.log(key)
             break
         }
         console.log("Suitable icon not found.")
@@ -645,6 +646,7 @@ const setTheme = (description) => {
 
     let themeClasses = {
         "sky is clear": "sunny",
+        "clear sky": "sunny",
         "few clouds": "cloudy",
         "scattered clouds": "cloudy",
         "overcast clouds": "cloudy",

@@ -7,6 +7,7 @@
     <!--Importing Frappe charts-->
     <script src="https://unpkg.com/frappe-charts@1.2.4/dist/frappe-charts.min.iife.js"></script>
     <!--Importing Bootstrap-->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/twitter-bootstrap/4.6.2/css/bootstrap.min.css">
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.7/dist/css/bootstrap.min.css" rel="stylesheet"
         integrity="sha384-LN+7fdVzj6u52u30Kp6M/trliBMCMKTyK833zpbD+pXdCLuTusPj697FH4R/5mcr" crossorigin="anonymous">
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.7/dist/js/bootstrap.bundle.min.js"
@@ -38,7 +39,7 @@
 
 <body>
     <header>
-        <div id="header-div" class="sunny">
+        <div id="header-div">
             <img src="assets/meteorology.png" alt="" class="page-icon">
             <h1>SÄÄ!</h1>
             <nav class="navbar navbar-expand-lg bg-light">
@@ -111,7 +112,7 @@
             <option>Humidity</option>
         </select>
 
-        <div class="card-div">
+        <div id="chart-container-div" class="card-div flex-nowrap overflow-auto">
             Temperature forecast for the next 24 hours
             <div id="hourly-chart"></div>
         </div>
@@ -123,7 +124,7 @@
                 <option value="2">3rd API</option>
             </select>
             <div id="div-weekly" class="card-div row">
-
+                    
             </div>
         </div>
         </div>

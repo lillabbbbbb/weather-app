@@ -72,7 +72,8 @@ select {
     font-family: 'Courier New', Courier, monospace;
 }
 
-button:hover, select:hover {
+button:hover,
+select:hover {
     background-color: #f0e06dd8;
 }
 
@@ -101,6 +102,7 @@ input {
 #country {
     display: flex;
 }
+
 .card-div {
     background-color: var(--card-background);
     border-radius: var(--main-border-radius);
@@ -114,44 +116,47 @@ input {
 #current-icon
 
 /*Source: https://github.com/AsmrProg-YT/100-days-of-javascript/blob/master/Day%20%2310%20-%20Weather%20App/style.css */
-#weather-summary{
+#weather-summary {
     width: 100%;
     display: flex;
     justify-content: space-between;
     margin-top: 30px;
 }
 
-#weather-summary #wind-speed, .weather-summary #humidity, .weather-summary #pressure{
+#weather-summary #wind-speed,
+.weather-summary #humidity,
+.weather-summary #pressure {
     width: 50%;
     display: flex;
     align-items: center;
     justify-content: space-between;
     height: 100px;
 }
-#weather-summary #humidity{
+
+#weather-summary #humidity {
     padding-left: 20px;
     justify-content: flex-start;
 }
 
-#weather-summary #wind-speed{
+#weather-summary #wind-speed {
     padding-right: 20px;
     justify-content: flex-end;
 }
 
-.weather-summary i{
+.weather-summary i {
     color: #06283D;
     font-size: 26px;
     margin-right: 10px;
     margin-top: 6px;
 }
 
-#weather-summary span{
+#weather-summary span {
     color: #06283D;
     font-size: 22px;
     font-weight: 500;
 }
 
-#weather-summary p{
+#weather-summary p {
     color: #06283D;
     font-size: 14px;
     font-weight: 500;
@@ -166,6 +171,17 @@ input {
     padding-bottom: var(--main-padding);
     border: thin;
     border-color: black;
+
+}
+
+#chart-container-div {
+    overflow-x: auto;
+    white-space: nowrap;
+    flex-wrap: nowrap;
+}
+
+#hourly-chart {
+    flex: 0 0 auto;
 
 }
 
@@ -186,13 +202,14 @@ input {
     margin: 50px;
     align-items: center;
 }
+
 .daily-icon {
     height: 80px;
 }
 
 
 .sunny {
-    background-color: linear-gradient(130deg, #47e8eed8, orange);
+    background-color: linear-gradient(130deg, #78e0e2d8, orange);
 
 }
 
@@ -200,9 +217,7 @@ input {
     background-color: linear-gradient(130deg, orange, red);
 }
 
-.sunny-rainy {
-
-}
+.sunny-rainy {}
 
 .hot-rainy {}
 
@@ -230,5 +245,5 @@ input {
 
 @media (min-width: 1100px) {
     /*Layout for desktops*/
-    
+
 }
