@@ -186,6 +186,10 @@ const addToLastVisited = (cityName) => {
 const searchByCityName = async (searchTerm) => {
     //console.log(searchTerm)
 
+    if(!searchTerm){
+        return
+    }
+
 
     //Fetch first API 
     let JSON = await ((await fetch("https://api.openweathermap.org/data/2.5/weather?q=" + searchTerm + "&appid=" + apiKey1 + getUnits())).json())
@@ -203,9 +207,15 @@ const searchByCityName = async (searchTerm) => {
     currentIconImg.src = loadMyIcon(JSON.weather[0].description)
     currentIconImg.setAttribute("class", "current-icon")
 
-    //set relevant theme
+    //set theme based on weather
+    const html = document.getElementsByTagName("html")
     const body = document.getElementsByTagName("body")
-    body[0].setAttribute("class", setTheme(JSON.weather[0].description))
+    //testing
+    //html[0].setAttribute("class", "stormy")
+    //body[0].setAttribute("class", "stormy")
+    html[0].setAttribute("class", setTheme(JSON.weather[0].description, JSON.main.temp))
+    body[0].setAttribute("class", setTheme(JSON.weather[0].description, JSON.main.temp))
+    //body[0].setAttribute("class", "test")
 
 
 
@@ -259,7 +269,7 @@ const searchByCityName = async (searchTerm) => {
     let pressure = JSON.main.pressure
     let visibility = JSON.visibility / 1000
 
-    document.getElementById("main-description").innerText = mainWeather
+    document.getElementById("main-description").innerText = mainWeather + ", " + mainWeatherDescr
     document.getElementById("feels-like").innerText = "Feels like " + feelsLike + selector.value
     document.getElementById("sunrise").innerText = "Sunrise: " + formattedSunrise
     document.getElementById("sunset").innerText = "Sunset: " + formattedSunset
@@ -474,6 +484,7 @@ const getWeeklyForecast = async (numberOfDays) => {
         const p = document.createElement("p")
         p.innerText = weeklyJSON.list[i].weather[0].description
 
+        //dayWidgetDiv.setAttribute("background", setTheme(p, weeklyJSON.list[i].temp.day)."background")
         dayWidgetDiv.appendChild(icon)
         dayWidgetDiv.appendChild(p)
         dayWidgetDiv.appendChild(dayDiv)
@@ -626,7 +637,7 @@ const loadMyIcon2 = (description, temperature, time) => {
             //console.log(key)
             break
         }
-        console.log("Suitable icon not found.")
+        //console.log("Suitable icon not found.")
     }
 
     //check for hot temperature
@@ -642,7 +653,7 @@ const loadMyIcon2 = (description, temperature, time) => {
 }
 
 //sets matching color theme (through setting CSS classes to HTML tags) based on the current weather
-const setTheme = (description) => {
+const setTheme = (description, temperature) => {
 
     let themeClasses = {
         "sky is clear": "sunny",
@@ -674,15 +685,17 @@ const setTheme = (description) => {
         console.log("Suitable icon not found.")
     }
 
+    let hot = false;
     //check for hot temperature
-    /*
     const HOT_TEMP_CELS = 35
     const HOT_TEMP_FAHR = HOT_TEMP_CELS * (9 / 5) + 32
     const HOT_TEMP_KELV = HOT_TEMP_CELS + 273.15
     if ((selector.value == CELSIUS && temperature >= HOT_TEMP_CELS) || (selector.value == FAHRENHEIT && temperature >= HOT_TEMP_FAHR) || (selector.value == KELVIN && temperature >= HOT_TEMP_KELV)) {
-        className = "hot-sunny"
+        hot = true
+        className = "hot-cloudy"
+
     }
-    */
+    console.log(temperature + " " + className)
 
 
     return className

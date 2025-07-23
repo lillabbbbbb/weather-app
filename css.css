@@ -1,10 +1,12 @@
 :root {
     --main-color: #f0e06dd8;
     --main-background-color: linear-gradient(45deg, #e0a70b 40%, #47a3ce);
-    --card-background: rgba(54, 38, 38, 0.5);
+    --card-background-light: rgba(255, 255, 255, var(--main-opacity));
+    --card-background-dark: rgba(0, 0, 0, var(--main-opacity));
+    --main-opacity: 0.4;
     --main-border-color: #000000ff;
     --main-margin: 10px;
-    --main-border-radius: 25px;
+    --main-border-radius: 35px;
     --main-padding: 10px
 }
 
@@ -32,6 +34,8 @@ input.text {
     background: var(--main-background-color);
 
 }
+
+img {}
 
 html,
 body {
@@ -72,9 +76,22 @@ select {
     font-family: 'Courier New', Courier, monospace;
 }
 
+button,
+select,
+input,
+p,
+h1,
+img {
+    transition: all 0.4s;
+}
+
 button:hover,
-select:hover {
-    background-color: #f0e06dd8;
+select:hover,
+input:hover,
+p:hover,
+h1:hover,
+img:hover {
+    transform: scale(1.1);
 }
 
 input {
@@ -104,14 +121,20 @@ input {
 }
 
 .card-div {
-    background-color: var(--card-background);
+    background-color: var(--card-background-light);
     border-radius: var(--main-border-radius);
     margin: 10px;
     padding-top: var(--main-padding);
     padding-bottom: var(--main-padding);
     border: thin;
     border-color: black;
+    transition: all 0.4s;
 }
+
+.card-div:hover {
+    transform: scale(1.008);
+}
+
 
 #current-icon
 
@@ -171,7 +194,6 @@ input {
     padding-bottom: var(--main-padding);
     border: thin;
     border-color: black;
-
 }
 
 #chart-container-div {
@@ -182,7 +204,7 @@ input {
 
 #hourly-chart {
     flex: 0 0 auto;
-
+    color: white;
 }
 
 #map {
@@ -207,34 +229,138 @@ input {
     height: 80px;
 }
 
+.daily-f-card-div {
+    background: linear-gradient(20deg, #8ebadd 20%, rgb(57, 144, 216));
+}
+
+.test {
+    padding: 50px;
+    background: #47a3ce;
+}
 
 .sunny {
-    background-color: linear-gradient(130deg, #78e0e2d8, orange);
+    background: linear-gradient(27deg, rgb(245, 243, 114) 60%, #8cd5ebd8);
+    color: black;
 
+    button,
+    select {
+        background: linear-gradient(20deg, #66a9bdd8 20%, rgb(243, 240, 88));
+        border-color: #06283D;
+        margin: 5px;
+    }
+
+    input {
+        border-color: #06283D;
+        background: #06283D;
+        color: white;
+        padding: 10px;
+    }
 }
 
 .hot-sunny {
-    background-color: linear-gradient(130deg, orange, red);
+    background: linear-gradient(70deg, orange 70%, red);
 }
 
 .sunny-rainy {}
 
-.hot-rainy {}
+.hot-rainy,
+.hot-cloudy {
+    background: linear-gradient(30deg, rgb(211, 101, 101) 70%, rgb(90, 132, 167), #b0cfe9);
+    color: white;
 
-.rainy-cloudy {
-    background-color: linear-gradient(130deg, #abceeb, rgb(93, 175, 243));
+    button,
+    select {
+        background: linear-gradient(20deg, #8ebadd 20%, rgb(57, 144, 216), rgb(211, 101, 101));
+        border-color: white;
+        margin: 5px;
+    }
+
+    input {
+        border-color: white;
+        background: #06283D;
+        color: white;
+        padding: 10px;
+    }
+
+    .card-div {
+        background-color: var(--card-background-dark);
+    }
 }
 
+
+.sunny-cloudy {}
+
 .cloudy {
-    background-color: linear-gradient(130deg, #abceeb, rgb(138, 176, 207));
+    background: linear-gradient(30deg, rgb(90, 132, 167) 70%, #b0cfe9);
+    color: white;
+
+    button,
+    select {
+        background: linear-gradient(20deg, #8ebadd 20%, rgb(57, 144, 216));
+        border-color: #06283D;
+        margin: 5px;
+    }
+
+    input {
+        border-color: #06283D;
+        background: #06283D;
+        opacity: 0.8;
+        color: white;
+        padding: 10px;
+    }
+
+    .card-div {
+        background-color: var(--card-background-dark);
+    }
+
 }
 
 .snowy {
-    background-color: linear-gradient(130deg, #abceeb, rgb(231, 237, 241));
+    background: linear-gradient(30deg, #abceeb 70%, rgb(231, 237, 241));
+    color: white;
+
+    button,
+    select {
+        background: linear-gradient(20deg, rgb(231, 237, 241) 20%, #abceeb);
+        border-color: #06283D;
+        margin: 5px;
+    }
+
+    input {
+        border-color: #ffffff;
+        background: #06283D;
+        color: white;
+        padding: 10px;
+    }
+
+    .daily-f-card-div {
+        background: linear-gradient(30deg, #abceeb 70%, rgb(231, 237, 241));
+    }
 }
 
+.rainy-cloudy,
 .stormy {
-    background-color: linear-gradient(130deg, #577496, rgb(138, 176, 207));
+    background: linear-gradient(70deg, #577496 70%, rgb(138, 176, 207));
+    color: white;
+
+    button,
+    select {
+        background: linear-gradient(10deg, rgb(138, 176, 207) 20%, #476180);
+        border-color: #5b7a9e;
+        margin: 5px;
+    }
+
+    input {
+        border-color: #5b7a9e;
+        background: #06283D;
+        opacity: 0.5;
+        color: white;
+        padding: 10px;
+    }
+
+    .card-div {
+        background-color: var(--card-background-dark);
+    }
 }
 
 
@@ -244,6 +370,11 @@ input {
 }
 
 @media (min-width: 1100px) {
-    /*Layout for desktops*/
 
+    /*Layout for desktops*/
+    div,
+    section,
+    aside {
+        max-width: 1100px;
+    }
 }

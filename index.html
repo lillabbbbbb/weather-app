@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html lang="en" class="sunny">
+<html lang="en">
 
 <head>
     <meta charset="UTF-8">
@@ -40,41 +40,22 @@
 <body>
     <header>
         <div id="header-div">
-            <img src="assets/meteorology.png" alt="" class="page-icon">
-            <h1>SÄÄ!</h1>
-            <nav class="navbar navbar-expand-lg bg-light">
-                <a class="navbar-brand" href="#"></a>
-                <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav"
-                    aria-controls="navbarNav" aria-expanded="false" aria-label="Toggle navigation">
-                    <span class="navbar-toggler-icon"></span>
-                </button>
-                <div class="collapse navbar-collapse" id="navbarNav">
-                    <div class="navbar-nav">
-                        <p>Advanced options</p>
-                        <a class="nav-link" href="#">Advanced search</a>
-                        <a class="nav-link" href="#">Forecast days</a>
-                        <a class="nav-link" href="#">Menu item 3</a>
-                        <a class="nav-link" href="#">Menu item 4</a>
-                    </div>
+        </div>
+        <div class=" flex-grow-1 row main-col-div">
+            <section class=" border p-2 card-div">
+                <div id="last-visited">Last visited:</div>
+                <div id="favorites">Favorites:
                 </div>
-            </nav>
 
         </div>
+        <button id="geolocation">Use current location</button>
         <form action="submit">
             <input type="text" id="search-bar" placeholder="e.g. Kouvola">
             <button id="button-search">Search</button>
         </form>
-        <button id="geolocation">Use current location</button>
         <p id="status"></p>
     </header>
     <main>
-        <div class=" flex-grow-1 row main-col-div">
-            <section class=" border p-2 card-div">
-                <div id="favorites">Favorites:
-                </div>
-                <div id="last-visited">Last visited:</div>
-
-        </div>
         <section class="flex-grow-1 p-2 mb-2 main-col-div">
             <div class="card-div">
                 <p id="city">City</p>
@@ -101,7 +82,9 @@
             <option value="°F">Fahrenheit</option>
             <option value="K">Kelvin</option>
         </select>
-        <select id="select-provider-chart">
+
+        <div id="chart-container-div" class="card-div flex-nowrap overflow-auto">
+            <select id="select-provider-chart">
             <option>OpenWeatherMap</option>
             <option>2nd API</option>
             <option>3rd API</option>
@@ -111,9 +94,7 @@
             <option>Precip</option>
             <option>Humidity</option>
         </select>
-
-        <div id="chart-container-div" class="card-div flex-nowrap overflow-auto">
-            Temperature forecast for the next 24 hours
+            <p>Temperature forecast for the next 24 hours</p>
             <div id="hourly-chart"></div>
         </div>
         <div class="card-div">
