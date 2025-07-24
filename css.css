@@ -223,15 +223,8 @@ input {
 
 #hourly-chart {
     flex: 0 0 auto;
-    color: white;
     fill: white;
     margin: 0;
-}
-.graph-svg-tip, .graph-svg-tip > .svg-pointer{
-    background: #fff;
-}
-.graph-svg-tip > .title, .graph-svg-tip > .title > strong {
-    color: #000;
 }
 
 #map {

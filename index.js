@@ -19,6 +19,8 @@ const CELSIUS = "℃"
 const FAHRENHEIT = "°F"
 const KELVIN = "K"
 
+let forecastDaysNr = 7
+
 let units = getUnits()
 let map;
 
@@ -44,29 +46,45 @@ let data = {
 
 let providerNames = [
     "OpenWeatherMap",
-    "2nd API",
+    "Tomorrow IO",
     "OpenMeteo"
 ]
 
 let runProviders = {
     "OpenWeatherMap": searchByCityName(),
-    "2nd API": loadAPI2(),
+    "Tomorrow IO": loadAPI2(),
     "OpenMeteo": loadAPI3(),
 }
+let k = 0
 for (let [key, value] of Object.entries(runProviders)) {
     let option1 = document.createElement("option")
     option1.text = key
+    option1.setAttribute("value", k)
     generalProviderSelector.add(option1)
     let option2 = document.createElement("option")
     option2.text = key
     option2.selected = true
     chartProviderSelector.add(option2)
+    k++
 }
 
 let hourlyDataTotal = [
     [],
     [],
     []
+]
+
+let dailyDataTotal = [
+    [
+        [0,0,0], [0,0,0]
+    ],
+    [
+        []
+    ],
+    [
+        []
+    ],
+
 ]
 
 
@@ -100,6 +118,11 @@ function getUnits() {
 }
 selector.addEventListener("change", (e) => {
     selector.value = e.target.value
+    searchByCityName(searchArea.value)
+})
+
+generalProviderSelector.addEventListener("change", (e) => {
+    generalProviderSelector.value = e.target.value
     searchByCityName(searchArea.value)
 })
 
@@ -305,8 +328,8 @@ async function searchByCityName(searchTerm) {
     loadMap(latitude, longitude)
 
 
-    console.log("API 3:")
     HourlyApi3(latitude, longitude, date.getUTCHours(), diffInHours)
+    //HourlyApi2(date.getUTCHours(), diffInHours)
 
 
 
@@ -360,7 +383,89 @@ function fromUnixToCurrent(unixTime, diffInHours) {
 
 }
 
+function convert (value, previousMetric, newMetric){
+    const c = CELSIUS
+    const f = FAHRENHEIT
+    const k = KELVIN
+    let newValue;
+    //from Celsius to Fahrenheit
+    if (previousMetric == c && newMetric == f) {
+        newValue = (value * (9 / 5) + 32)
+    }
+
+    //from Fahrenheit to Celsius
+    else if (previousMetric == f && newMetric == c) {
+        newValue = ((value - 32) * 5 / 9)
+    }
+
+    //from Celsius to Kelvin
+    else if (previousMetric == c && newMetric == k) {
+        newValue = (value + 273.15)
+    }
+
+    //from Kelvin to Celsius
+    else if (previousMetric == k && newMetric == c) {
+        newValue = (value - 273.15)
+    }
+
+    //from Fahrenheit to Kelvin
+    else if (previousMetric == f && newMetric == k) {
+        newValue = ((value - 32) * 5 / 9 + 273.15)
+    }
+
+    //from Kelvin to Fahrenheit
+    else if (previousMetric == k && newMetric == f) {
+        newValue = ((value - 273.15) * 9 / 5 + 32)
+    }
+    else if(previousMetric == newMetric){
+        newValue = value
+    }
+    console.log(value + previousMetric + " has been changed to " + newValue + newMetric)
+    return newValue
+}
+
+async function HourlyApi2(UTCHour, diffInHours){
+    console.log("Fetch Second API: Tomorrow IO API")
+    
+    const url2 = "https://api.tomorrow.io/v4/weather/forecast?location=" + searchArea.value + "&timesteps=1h&units=metric&apikey=Cgp1nINqRCsErUN8HM74lwRgOyAP0ulF"
+    const tomHourlyJSON = await( (await (fetch(url2))).json())
+    console.log(tomHourlyJSON)
+
+
+    let hour = UTCHour + diffInHours
+
+    let tomHourlyValues = []
+    let tomHourlyLabels = []
+
+    let startIndex;
+
+    console.log(tomHourlyJSON.timelines.hourly[0].time.substring(11,13))
+
+    for (let i = 0; i < tomHourlyJSON.timelines.hourly.length; i++) {
+        console.log(i + ":   hour = " + hour + ", tomHourlyJSON.timelines.hourly[i].time.substring(11,13) = " + tomHourlyJSON.timelines.hourly[i].time.substring(11,13))
+        if ((hour + 1) == parseInt(tomHourlyJSON.timelines.hourly[i].time.substring(11,13)) || (hour - 23) == parseInt(tomHourlyJSON.timelines.hourly[i].time.substring(11,13))) {
+            startIndex = i;
+            break;
+        }
+    }
+    console.log(startIndex)
+    for (let i = startIndex + 1; i < startIndex + 1 + 24; i++) {
+        tomHourlyValues.push(tomHourlyJSON.timelines.hourly[i].values.temperature)
+        tomHourlyLabels.push(tomHourlyJSON.timelines.hourly[i].time.substring(11,13))
+    }
+    console.log(tomHourlyValues)
+    console.log(tomHourlyLabels)
+
+    //convert to another metric if necessary
+    for(let i = 0; i < tomHourlyValues.length; i++){
+        tomHourlyValues[i] = convert(tomHourlyValues[i], CELSIUS, selector.value)
+    }
+
+    hourlyDataTotal[1] = tomHourlyValues
+}
+
 async function HourlyApi3(latitude, longitude, UTCHour, diffInHours) {
+    console.log("Fetch Third API: Open Meteo API")
 
     const url = "https://api.open-meteo.com/v1/forecast?latitude=" + latitude + "&longitude=" + longitude + "&hourly=temperature_2m,precipitation,relative_humidity_2m&timezone=GMT&forecast_days=2&timeformat=unixtime"
     let hourly3JSON = await ((await fetch(url)).json())
@@ -391,6 +496,11 @@ async function HourlyApi3(latitude, longitude, UTCHour, diffInHours) {
 
     console.log(api3HourlyValues)
     console.log(api3HourlyLabels)
+
+    //convert to another metric if necessary
+    for(let i = 0; i < api3HourlyValues.length; i++){
+        api3HourlyValues[i] = convert(api3HourlyValues[i], CELSIUS, selector.value)
+    }
 
     hourlyDataTotal[2] = api3HourlyValues
     console.log(hourlyDataTotal)
@@ -476,57 +586,13 @@ async function createChart() {
 
     hourlyDataTotal[0] = owmHourlyValues
 
-    hourlyDataTotal[1] = temperatures.hourlyDay[1]
-
-    //Fetch Second API: Tomorrow IO API
-    /*
-    const url2 = "https://api.tomorrow.io/v4/weather/forecast?location=" + searchArea.value + "&timesteps=1h" + getUnits() + "&apikey=Cgp1nINqRCsErUN8HM74lwRgOyAP0ulF"
-    const tomHourlyJSON = await( (await (fetch(url2))).json())
-    console.log(tomHourlyJSON)
-
-
-    let tomHourlyValues = []
-    let tomHourlyLabels = []
-
-    let startIndex2;
-
-    console.log(tomHourlyJSON.timelines.hourly[0].time.substring(11,13))
-
-    for (let i = 0; i < tomHourlyJSON.timelines.hourly.length; i++) {
-        console.log(i + ":   hour = " + hour + ", tomHourlyJSON.timelines.hourly[i].time.substring(11,13) = " + tomHourlyJSON.timelines.hourly[i].time.substring(11,13))
-        if ((hour + 1) == parseInt(tomHourlyJSON.timelines.hourly[i].time.substring(11,13)) || (hour - 23) == parseInt(tomHourlyJSON.timelines.hourly[i].time.substring(11,13))) {
-            startIndex2 = i;
-            break;
-        }
-    }
-    console.log(startIndex2)
-    for (let i = startIndex + 1; i < startIndex + 1 + 24; i++) {
-        tomHourlyValues.push(tomHourlyJSON.timelines.hourly[i].values.temperature)
-        tomHourlyLabels.push(tomHourlyJSON.timelines.hourly[i].time.substring(11,13))
-    }
-    console.log(tomHourlyValues)
-    console.log(tomHourlyLabels)
-
-    hourlyDataTotal[1] = tomHourlyValues
-    */
-
-
-
-
-    //Fetch Third API: Open Meteo API
-    //Note: Open Meteo search works only with lat and long. I am using the lat and long values of the search from the first API because that's the most convenient
-    let latitude = hourlyJSON.city.coord.lat
-    let longitude = hourlyJSON.city.coord.lon
-
-    const url3 = "https://api.open-meteo.com/v1/forecast?latitude=" + latitude + "&longitude=" + longitude + "&current=temperature_2m,wind_speed_10m&hourly=temperature_2m,relative_humidity_2m,wind_speed_10m"
-    const omHourlyJSON = await ((await (fetch(url3))).json())
-    console.log(omHourlyJSON)
-
+    
+//hourlyDataTotal[1] = temperatures.hourlyDay[1]
 
     let activeDatasets = []
     //Add datasets of those providers which are selected
     for (let i = 0; i < chartProviderSelector.children.length; i++) {
-        if (chartProviderSelector.children[i].selected == true) {
+        /*if (chartProviderSelector.children[i].selected == true) {*/
             //exclude Tomorrow API hourly values when the unit is Kelvin
             if(!(chartProviderSelector.children[i].value == "Tomorrow API" && selector.value == KELVIN)){
                 activeDatasets.push({
@@ -534,7 +600,7 @@ async function createChart() {
                 values: hourlyDataTotal[i]
             })
             }
-        }
+        //}
     }
     
 
@@ -553,7 +619,10 @@ async function createChart() {
 
 }
 
-const getWeeklyForecast = async (numberOfDays) => {
+async function getWeeklyAPI1(numberOfDays) {
+
+    const apiNr = 1
+
     while (weeklyDiv.lastElementChild) {
         weeklyDiv.removeChild(weeklyDiv.lastElementChild)
     }
@@ -565,27 +634,113 @@ const getWeeklyForecast = async (numberOfDays) => {
     const weeklyJSON = await ((await fetch(url1)).json())
     console.log(weeklyJSON)
 
-    const h31 = document.createElement("h3")
-    h31.innerText = "OpenWeatherMap"
-    const api1Div = document.createElement("div")
-    api1Div.setAttribute("class", "col")
-    api1Div.appendChild(h31)
+    let avg, max, min, description
+
+    console.log(weeklyJSON.list)
 
     for (let i = 0; i < weeklyJSON.list.length; i++) {
+        avg = weeklyJSON.list[i].temp.day
+        min = weeklyJSON.list[i].temp.min
+        max = weeklyJSON.list[i].temp.max
+        description = weeklyJSON.list[i].weather[0].description
+
+        dailyDataTotal[apiNr - 1][i][0] = avg
+        dailyDataTotal[apiNr - 1][i][1] = min
+        dailyDataTotal[apiNr - 1][i][2] = max
+        dailyDataTotal[apiNr - 1][i][3] = description
+
+        console.log("API " + apiNr + ": " + dailyDataTotal[apiNr - 1][i])
+    }
+}
+
+async function getWeeklyAPI2() {
+
+    let apiNr = 2
+
+    //Fetch Second API: Tomorrow IO API
+    const url2 = "https://api.tomorrow.io/v4/weather/forecast?location=" + searchArea.value + "&timesteps=1d&units=metric&apikey=Cgp1nINqRCsErUN8HM74lwRgOyAP0ulF"
+    const tomDailyJSON = await( (await (fetch(url2))).json())
+    console.log(tomDailyJSON)
+
+    for (let i = 0; i < tomDailyJSON.timelines.daily.length; i++) {
+
+        avg = tomDailyJSON.timelines.daily[i].values.temperatureAvg
+        min = tomDailyJSON.timelines.daily[i].values.temperatureMin
+        max = tomDailyJSON.timelines.daily[i].values.temperatureMax
+        description = dailyDataTotal[0][i][3]
+
+        dailyDataTotal[apiNr - 1][i][0] = convert(avg)
+        dailyDataTotal[apiNr - 1][i][1] = convert(min)
+        dailyDataTotal[apiNr - 1][i][2] = convert(max)
+        dailyDataTotal[apiNr - 1][i][3] = description
+
+        console.log("API " + apiNr + ": " + dailyDataTotal[apiNr - 1][i])
+    }
+}
+
+async function getWeeklyAPI3() {
+
+    let apiNr = 3
+
+    //Fetch Third API: Open Meteo API
+    const url3 = "https://api.tomorrow.io/v4/weather/forecast?location=" + searchArea.value + "&timesteps=1d&units=metric&apikey=Cgp1nINqRCsErUN8HM74lwRgOyAP0ulF"
+    const JSON = await( (await (fetch(url3))).json())
+    console.log(JSON)
+
+    for (let i = 0; i < JSON; i++) {
+
+        avg = JSON.timelines.daily[i].values.temperatureAvg
+        min = JSON.timelines.daily[i].values.temperatureMin
+        max = JSON.timelines.daily[i].values.temperatureMax
+        description = dailyDataTotal[0][i][3]
+
+        dailyDataTotal[apiNr - 1][i][0] = convert(avg)
+        dailyDataTotal[apiNr - 1][i][1] = convert(min)
+        dailyDataTotal[apiNr - 1][i][2] = convert(max)
+        dailyDataTotal[apiNr - 1][i][3] = description
+
+        console.log("API " + apiNr + ": " + dailyDataTotal[apiNr - 1][i])
+    }
+}
+
+const getWeeklyForecast = async () => {
+
+    getWeeklyAPI1(forecastDaysNr)
+    getWeeklyAPI2()
+    getWeeklyAPI3()
+
+    console.log(dailyDataTotal)
+
+    while (weeklyDiv.lastElementChild) {
+        weeklyDiv.removeChild(weeklyDiv.lastElementChild)
+    }
+    console.log(getUnits())
+
+
+    let avg, max, min, description 
+
+    const apiNr = generalProviderSelector[generalProviderSelector.value].value
+    
+    for (let i = 0; i < forecastDaysNr; i++) {
+        avg = dailyDataTotal[apiNr][i][0]
+        min = dailyDataTotal[apiNr][i][1]
+        max = dailyDataTotal[apiNr][i][2]
+        description = dailyDataTotal[apiNr][i][3]
+
         const dayWidgetDiv = document.createElement("div")
         dayWidgetDiv.setAttribute("class", "daily-f-card-div")
         const dayDiv = document.createElement("div")
-        dayDiv.innerText = "Day " + (i + 1) + ": " + weeklyJSON.list[i].temp.day + selector.value
+        dayDiv.innerText = "Day " + (i + 1) + ": " + avg + selector.value
         const minDiv = document.createElement("div")
-        minDiv.innerText = "Min: " + weeklyJSON.list[i].temp.min + selector.value
+        minDiv.innerText = "Min: " + min + selector.value
         const maxDiv = document.createElement("div")
-        maxDiv.innerText = "Max: " + weeklyJSON.list[i].temp.max + selector.value
+        maxDiv.innerText = "Max: " + max + selector.value
 
         const icon = document.createElement("img")
-        icon.src = loadMyIcon2(weeklyJSON.list[i].weather[0].description)
+        icon.src = loadMyIcon2(description)
         icon.setAttribute("class", "daily-icon")
         const p = document.createElement("p")
-        p.innerText = weeklyJSON.list[i].weather[0].description
+        p.innerText = description
 
         //dayWidgetDiv.setAttribute("background", setTheme(p, weeklyJSON.list[i].temp.day)."background")
         dayWidgetDiv.appendChild(icon)
@@ -597,84 +752,6 @@ const getWeeklyForecast = async (numberOfDays) => {
         api1Div.appendChild(dayWidgetDiv)
     }
     weeklyDiv.appendChild(api1Div)
-
-    //This div data is just for testing, because Tomorrow API number of calls is very limited
-    const h32 = document.createElement("h3")
-    h32.innerText = "Fake Data"
-    const api2Div = document.createElement("div")
-    api2Div.setAttribute("class", "col")
-    api2Div.appendChild(h32)
-
-    for (let i = 0; i < weeklyJSON.list.length; i++) {
-        const dayWidgetDiv = document.createElement("div")
-        dayWidgetDiv.setAttribute("class", "daily-f-card-div")
-        const dayDiv = document.createElement("div")
-        dayDiv.innerText = "Day " + (i + 1) + ": " + weeklyJSON.list[i].temp.day + selector.value
-        const minDiv = document.createElement("div")
-        minDiv.innerText = "Min: " + weeklyJSON.list[i].temp.min + selector.value
-        const maxDiv = document.createElement("div")
-        maxDiv.innerText = "Max: " + weeklyJSON.list[i].temp.max + selector.value
-
-        const icon = document.createElement("img")
-        icon.src = loadMyIcon2(weeklyJSON.list[i].weather[0].description)
-        icon.setAttribute("class", "daily-icon")
-        const p = document.createElement("p")
-        p.innerText = weeklyJSON.list[i].weather[0].description
-
-        dayWidgetDiv.appendChild(icon)
-        dayWidgetDiv.appendChild(p)
-        dayWidgetDiv.appendChild(dayDiv)
-        dayWidgetDiv.appendChild(minDiv)
-        dayWidgetDiv.appendChild(maxDiv)
-
-        api2Div.appendChild(dayWidgetDiv)
-    }
-    weeklyDiv.appendChild(api2Div)
-
-
-    //Fetch Second API: Tomorrow IO API
-    /*
-    const url2 = "https://api.tomorrow.io/v4/weather/forecast?location=" + searchArea.value + "&timesteps=1d" + getUnits() + "&apikey=Cgp1nINqRCsErUN8HM74lwRgOyAP0ulF"
-    const tomDailyJSON = await( (await (fetch(url2))).json())
-    console.log(tomDailyJSON)
-
-
-    let tomDailyValues = []
-
-    console.log(tomDailyJSON.timelines.daily[0].values.temperatureAvg)
-    console.log(tomDailyJSON.timelines.daily[0].values.temperatureMin)
-    console.log(tomDailyJSON.timelines.daily[0].values.temperatureMax)
-
-    const h32 = document.createElement("h3")
-    h32.innerText = "Tomorrow API"
-    weeklyDiv.appendChild(h32)
-
-    
-    for (let i = 0; i < weeklyJSON.list.length; i++) {
-        const dayWidgetDiv = document.createElement("div")
-        dayWidgetDiv.setAttribute("class", "daily-f-card-div")
-        const dayDiv = document.createElement("div")
-        dayDiv.innerText = "Day " + (i + 1) + ": " + tomDailyJSON.timelines.daily[0].values.temperatureAvg + selector.value
-        const minDiv = document.createElement("div")
-        minDiv.innerText = "Min: " + tomDailyJSON.timelines.daily[0].values.temperatureMin + selector.value
-        const maxDiv = document.createElement("div")
-        maxDiv.innerText = "Max: " + tomDailyJSON.timelines.daily[0].values.temperatureMax + selector.value
-
-        const icon = document.createElement("img")
-        icon.src = loadMyIcon2(weeklyJSON.list[i].weather[0].description)
-        icon.setAttribute("class", "daily-icon")
-        const p = document.createElement("p")
-        p.innerText = weeklyJSON.list[i].weather[0].description
-
-        dayWidgetDiv.appendChild(icon)
-        dayWidgetDiv.appendChild(p)
-        dayWidgetDiv.appendChild(dayDiv)
-        dayWidgetDiv.appendChild(minDiv)
-        dayWidgetDiv.appendChild(maxDiv)
-
-        weeklyDiv.appendChild(dayWidgetDiv)
-    }
-    */
 
 }
 
