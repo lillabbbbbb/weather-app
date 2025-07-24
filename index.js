@@ -74,17 +74,57 @@ let hourlyDataTotal = [
     []
 ]
 
+let avgDataTotal = [
+    [],
+    [],
+    []
+]
+let minDataTotal = [
+    [],
+    [],
+    []
+]
+let maxDataTotal = [
+    [],
+    [],
+    []
+]
+let descriptionDataTotal = [
+    [],
+    [],
+    []
+]
+
+
+//test data
 let dailyDataTotal = [
     [
-        [0,0,0], [0,0,0]
+        [23, 19, 24, "clear sky"],
+        [23, 19, 24, "clear sky"],
+        [23, 19, 24, "clear sky"],
+        [23, 19, 24, "clear sky"],
+        [23, 19, 24, "clear sky"],
+        [23, 19, 24, "clear sky"],
+        [23, 19, 24, "clear sky"],
     ],
     [
-        []
+        [23, 19, 24, "clear sky"],
+        [23, 19, 24, "clear sky"],
+        [23, 19, 24, "clear sky"],
+        [23, 19, 24, "clear sky"],
+        [23, 19, 24, "clear sky"],
+        [23, 19, 24, "clear sky"],
+        [23, 19, 24, "clear sky"],
     ],
     [
-        []
-    ],
-
+        [23, 19, 24, "clear sky"],
+        [23, 19, 24, "clear sky"],
+        [23, 19, 24, "clear sky"],
+        [23, 19, 24, "clear sky"],
+        [23, 19, 24, "clear sky"],
+        [23, 19, 24, "clear sky"],
+        [23, 19, 24, "clear sky"],
+    ]
 ]
 
 
@@ -123,6 +163,7 @@ selector.addEventListener("change", (e) => {
 
 generalProviderSelector.addEventListener("change", (e) => {
     generalProviderSelector.value = e.target.value
+    console.log("Now we are displaying the data from " + generalProviderSelector.value)
     searchByCityName(searchArea.value)
 })
 
@@ -358,7 +399,7 @@ async function searchByCityName(searchTerm) {
 
 
     createChart()
-    getWeeklyForecast(7)
+    getWeeklyForecast(latitude, longitude)
 
 }
 
@@ -383,7 +424,7 @@ function fromUnixToCurrent(unixTime, diffInHours) {
 
 }
 
-function convert (value, previousMetric, newMetric){
+function convert(value, previousMetric, newMetric) {
     const c = CELSIUS
     const f = FAHRENHEIT
     const k = KELVIN
@@ -417,18 +458,18 @@ function convert (value, previousMetric, newMetric){
     else if (previousMetric == k && newMetric == f) {
         newValue = ((value - 273.15) * 9 / 5 + 32)
     }
-    else if(previousMetric == newMetric){
+    else if (previousMetric == newMetric) {
         newValue = value
     }
     console.log(value + previousMetric + " has been changed to " + newValue + newMetric)
     return newValue
 }
 
-async function HourlyApi2(UTCHour, diffInHours){
+async function HourlyApi2(UTCHour, diffInHours) {
     console.log("Fetch Second API: Tomorrow IO API")
-    
+
     const url2 = "https://api.tomorrow.io/v4/weather/forecast?location=" + searchArea.value + "&timesteps=1h&units=metric&apikey=Cgp1nINqRCsErUN8HM74lwRgOyAP0ulF"
-    const tomHourlyJSON = await( (await (fetch(url2))).json())
+    const tomHourlyJSON = await ((await (fetch(url2))).json())
     console.log(tomHourlyJSON)
 
 
@@ -439,11 +480,11 @@ async function HourlyApi2(UTCHour, diffInHours){
 
     let startIndex;
 
-    console.log(tomHourlyJSON.timelines.hourly[0].time.substring(11,13))
+    console.log(tomHourlyJSON.timelines.hourly[0].time.substring(11, 13))
 
     for (let i = 0; i < tomHourlyJSON.timelines.hourly.length; i++) {
-        console.log(i + ":   hour = " + hour + ", tomHourlyJSON.timelines.hourly[i].time.substring(11,13) = " + tomHourlyJSON.timelines.hourly[i].time.substring(11,13))
-        if ((hour + 1) == parseInt(tomHourlyJSON.timelines.hourly[i].time.substring(11,13)) || (hour - 23) == parseInt(tomHourlyJSON.timelines.hourly[i].time.substring(11,13))) {
+        console.log(i + ":   hour = " + hour + ", tomHourlyJSON.timelines.hourly[i].time.substring(11,13) = " + tomHourlyJSON.timelines.hourly[i].time.substring(11, 13))
+        if ((hour + 1) == parseInt(tomHourlyJSON.timelines.hourly[i].time.substring(11, 13)) || (hour - 23) == parseInt(tomHourlyJSON.timelines.hourly[i].time.substring(11, 13))) {
             startIndex = i;
             break;
         }
@@ -451,13 +492,13 @@ async function HourlyApi2(UTCHour, diffInHours){
     console.log(startIndex)
     for (let i = startIndex + 1; i < startIndex + 1 + 24; i++) {
         tomHourlyValues.push(tomHourlyJSON.timelines.hourly[i].values.temperature)
-        tomHourlyLabels.push(tomHourlyJSON.timelines.hourly[i].time.substring(11,13))
+        tomHourlyLabels.push(tomHourlyJSON.timelines.hourly[i].time.substring(11, 13))
     }
     console.log(tomHourlyValues)
     console.log(tomHourlyLabels)
 
     //convert to another metric if necessary
-    for(let i = 0; i < tomHourlyValues.length; i++){
+    for (let i = 0; i < tomHourlyValues.length; i++) {
         tomHourlyValues[i] = convert(tomHourlyValues[i], CELSIUS, selector.value)
     }
 
@@ -498,7 +539,7 @@ async function HourlyApi3(latitude, longitude, UTCHour, diffInHours) {
     console.log(api3HourlyLabels)
 
     //convert to another metric if necessary
-    for(let i = 0; i < api3HourlyValues.length; i++){
+    for (let i = 0; i < api3HourlyValues.length; i++) {
         api3HourlyValues[i] = convert(api3HourlyValues[i], CELSIUS, selector.value)
     }
 
@@ -586,23 +627,23 @@ async function createChart() {
 
     hourlyDataTotal[0] = owmHourlyValues
 
-    
-//hourlyDataTotal[1] = temperatures.hourlyDay[1]
+
+    //hourlyDataTotal[1] = temperatures.hourlyDay[1]
 
     let activeDatasets = []
     //Add datasets of those providers which are selected
     for (let i = 0; i < chartProviderSelector.children.length; i++) {
         /*if (chartProviderSelector.children[i].selected == true) {*/
-            //exclude Tomorrow API hourly values when the unit is Kelvin
-            if(!(chartProviderSelector.children[i].value == "Tomorrow API" && selector.value == KELVIN)){
-                activeDatasets.push({
+        //exclude Tomorrow API hourly values when the unit is Kelvin
+        if (!(chartProviderSelector.children[i].value == "Tomorrow API" && selector.value == KELVIN)) {
+            activeDatasets.push({
                 name: chartProviderSelector.children[i].value,
                 values: hourlyDataTotal[i]
             })
-            }
+        }
         //}
     }
-    
+
 
     //build chart
     const hourlyChartData = {
@@ -638,19 +679,30 @@ async function getWeeklyAPI1(numberOfDays) {
 
     console.log(weeklyJSON.list)
 
+    let avgArray = []
+    let minArray = []
+    let maxArray = []
+    let descriptionArray = []
+
     for (let i = 0; i < weeklyJSON.list.length; i++) {
+        console.log("This is iteration " + i + " in API " + apiNr)
         avg = weeklyJSON.list[i].temp.day
         min = weeklyJSON.list[i].temp.min
         max = weeklyJSON.list[i].temp.max
         description = weeklyJSON.list[i].weather[0].description
 
-        dailyDataTotal[apiNr - 1][i][0] = avg
-        dailyDataTotal[apiNr - 1][i][1] = min
-        dailyDataTotal[apiNr - 1][i][2] = max
-        dailyDataTotal[apiNr - 1][i][3] = description
+        avgArray[i] = avg
+        minArray[i] = min
+        maxArray[i] = max
+        descriptionArray[i] = description
 
         console.log("API " + apiNr + ": " + dailyDataTotal[apiNr - 1][i])
     }
+
+    avgDataTotal[apiNr] = avgArray
+    minDataTotal[apiNr] = minArray
+    maxDataTotal[apiNr] = maxArray
+    descriptionDataTotal[apiNr] = descriptionArray
 }
 
 async function getWeeklyAPI2() {
@@ -659,73 +711,84 @@ async function getWeeklyAPI2() {
 
     //Fetch Second API: Tomorrow IO API
     const url2 = "https://api.tomorrow.io/v4/weather/forecast?location=" + searchArea.value + "&timesteps=1d&units=metric&apikey=Cgp1nINqRCsErUN8HM74lwRgOyAP0ulF"
-    const tomDailyJSON = await( (await (fetch(url2))).json())
+    const tomDailyJSON = await ((await (fetch(url2))).json())
     console.log(tomDailyJSON)
 
     for (let i = 0; i < tomDailyJSON.timelines.daily.length; i++) {
+        console.log("This is iteration " + i + " in API " + apiNr)
 
         avg = tomDailyJSON.timelines.daily[i].values.temperatureAvg
         min = tomDailyJSON.timelines.daily[i].values.temperatureMin
         max = tomDailyJSON.timelines.daily[i].values.temperatureMax
         description = dailyDataTotal[0][i][3]
 
-        dailyDataTotal[apiNr - 1][i][0] = convert(avg)
-        dailyDataTotal[apiNr - 1][i][1] = convert(min)
-        dailyDataTotal[apiNr - 1][i][2] = convert(max)
+        dailyDataTotal[apiNr - 1][i][0] = convert(avg, CELSIUS, selector.value)
+        dailyDataTotal[apiNr - 1][i][1] = convert(min, CELSIUS, selector.value)
+        dailyDataTotal[apiNr - 1][i][2] = convert(max, CELSIUS, selector.value)
         dailyDataTotal[apiNr - 1][i][3] = description
 
         console.log("API " + apiNr + ": " + dailyDataTotal[apiNr - 1][i])
     }
 }
 
-async function getWeeklyAPI3() {
+async function getWeeklyAPI3(latitude, longitude) {
 
     let apiNr = 3
 
     //Fetch Third API: Open Meteo API
-    const url3 = "https://api.tomorrow.io/v4/weather/forecast?location=" + searchArea.value + "&timesteps=1d&units=metric&apikey=Cgp1nINqRCsErUN8HM74lwRgOyAP0ulF"
-    const JSON = await( (await (fetch(url3))).json())
+    const url3 = "https://api.open-meteo.com/v1/forecast?latitude=" + latitude + "&longitude=" + longitude + "&hourly=temperature_2m,precipitation,relative_humidity_2m&timezone=GMT&forecast_days=" + forecastDaysNr + "&timeformat=unixtime"
+    const JSON = await ((await (fetch(url3))).json())
     console.log(JSON)
 
     for (let i = 0; i < JSON; i++) {
+        console.log("This is iteration " + i + " in API " + apiNr)
 
         avg = JSON.timelines.daily[i].values.temperatureAvg
         min = JSON.timelines.daily[i].values.temperatureMin
         max = JSON.timelines.daily[i].values.temperatureMax
         description = dailyDataTotal[0][i][3]
 
-        dailyDataTotal[apiNr - 1][i][0] = convert(avg)
-        dailyDataTotal[apiNr - 1][i][1] = convert(min)
-        dailyDataTotal[apiNr - 1][i][2] = convert(max)
+        dailyDataTotal[apiNr - 1][i] = []
+        dailyDataTotal[apiNr - 1][i][0] = convert(avg, CELSIUS, selector.value)
+        dailyDataTotal[apiNr - 1][i][1] = convert(min, CELSIUS, selector.value)
+        dailyDataTotal[apiNr - 1][i][2] = convert(max, CELSIUS, selector.value)
         dailyDataTotal[apiNr - 1][i][3] = description
 
         console.log("API " + apiNr + ": " + dailyDataTotal[apiNr - 1][i])
     }
 }
 
-const getWeeklyForecast = async () => {
+const getWeeklyForecast = (latitude, longitude) => {
+
+
 
     getWeeklyAPI1(forecastDaysNr)
-    getWeeklyAPI2()
-    getWeeklyAPI3()
+    //getWeeklyAPI2()
+    getWeeklyAPI3(latitude, longitude)
 
-    console.log(dailyDataTotal)
 
     while (weeklyDiv.lastElementChild) {
         weeklyDiv.removeChild(weeklyDiv.lastElementChild)
     }
     console.log(getUnits())
 
-
-    let avg, max, min, description 
-
     const apiNr = generalProviderSelector[generalProviderSelector.value].value
-    
+
+    console.log(dailyDataTotal)
+
+    let avg, min, max, description
+
     for (let i = 0; i < forecastDaysNr; i++) {
-        avg = dailyDataTotal[apiNr][i][0]
-        min = dailyDataTotal[apiNr][i][1]
-        max = dailyDataTotal[apiNr][i][2]
-        description = dailyDataTotal[apiNr][i][3]
+        console.log(i)
+        dailyDataTotal[apiNr]
+        avg = avgDataTotal[i]
+        min = minDataTotal[i]
+        max = maxDataTotal[i]
+        description = descriptionDataTotal[i]
+    }
+
+
+    for (let i = 0; i < forecastDaysNr; i++) {
 
         const dayWidgetDiv = document.createElement("div")
         dayWidgetDiv.setAttribute("class", "daily-f-card-div")
@@ -749,9 +812,8 @@ const getWeeklyForecast = async () => {
         dayWidgetDiv.appendChild(minDiv)
         dayWidgetDiv.appendChild(maxDiv)
 
-        api1Div.appendChild(dayWidgetDiv)
+        weeklyDiv.appendChild(dayWidgetDiv)
     }
-    weeklyDiv.appendChild(api1Div)
 
 }
 
