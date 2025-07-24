@@ -8,6 +8,7 @@ const lastVisitedDiv = document.getElementById("last-visited")
 const selector = document.getElementById("select-metrics")
 const weatherDataSelector = document.getElementById("select-weather-data")
 const chartProviderSelector = document.getElementById("select-provider-chart")
+const generalProviderSelector = document.getElementById("general-provider-selector")
 const weeklyDiv = document.getElementById("div-weekly")
 
 const apiKey1 = "d84bd23391e17b943fc45b049bd574d4"
@@ -21,6 +22,7 @@ const KELVIN = "K"
 let units = getUnits()
 let map;
 
+/*
 let data = {
     api1: {
         current: [],
@@ -38,12 +40,48 @@ let data = {
         dailyForecast: []
     }
 }
+*/
+
+let providerNames = [
+    "OpenWeatherMap",
+    "2nd API",
+    "OpenMeteo"
+]
+
+let runProviders = {
+    "OpenWeatherMap": searchByCityName(),
+    "2nd API": loadAPI2(),
+    "OpenMeteo": loadAPI3(),
+}
+for (let [key, value] of Object.entries(runProviders)) {
+    let option1 = document.createElement("option")
+    option1.text = key
+    generalProviderSelector.add(option1)
+    let option2 = document.createElement("option")
+    option2.text = key
+    option2.selected = true
+    chartProviderSelector.add(option2)
+}
+
+let hourlyDataTotal = [
+    [],
+    [],
+    []
+]
+
+
+
+let data = []
 
 let favs = []
 let lastVisited = []
 
 let iconPaths = {
 
+}
+
+function getProvider() {
+    return generalProviderSelector.value
 }
 
 
@@ -159,34 +197,34 @@ addFavButton.addEventListener("click", () => {
 const addToLastVisited = (cityName) => {
     console.log("this method is called")
     //check if the current search is not already in the last visited list
-    if(lastVisited.includes(cityName)) {
+    if (lastVisited.includes(cityName)) {
         console.log("Removing " + cityName + " from last visited")
         lastVisitedDiv.removeChild(lastVisitedDiv.childNodes[lastVisited.indexOf(cityName) + 1])
         lastVisited.pop(cityName)
         console.log(lastVisited)
     }
-    
+
     console.log("Adding " + cityName + " to last visited")
-        let p = document.createElement("p")
-        Object.assign(p, {
-            role: "button",
-            tabIndex: 0,
-            style: "cursor: pointer"
-        })
-        p.innerText = cityName
-        lastVisited.unshift(cityName)
-        lastVisitedDiv.insertBefore(p, lastVisitedDiv.childNodes[1])
-        p.addEventListener("click", () => {
-            searchArea.value = p.innerText
-            searchByCityName(searchArea.value)
-        })
+    let p = document.createElement("p")
+    Object.assign(p, {
+        role: "button",
+        tabIndex: 0,
+        style: "cursor: pointer"
+    })
+    p.innerText = cityName
+    lastVisited.unshift(cityName)
+    lastVisitedDiv.insertBefore(p, lastVisitedDiv.childNodes[1])
+    p.addEventListener("click", () => {
+        searchArea.value = p.innerText
+        searchByCityName(searchArea.value)
+    })
 
 }
 
-const searchByCityName = async (searchTerm) => {
+async function searchByCityName(searchTerm) {
     //console.log(searchTerm)
 
-    if(!searchTerm){
+    if (!searchTerm) {
         return
     }
 
@@ -262,6 +300,16 @@ const searchByCityName = async (searchTerm) => {
 
 
 
+    const latitude = JSON.coord.lat
+    const longitude = JSON.coord.lon
+    loadMap(latitude, longitude)
+
+
+    console.log("API 3:")
+    HourlyApi3(latitude, longitude, date.getUTCHours(), diffInHours)
+
+
+
     let mainWeatherDescr = JSON.weather[0].description
     let mainWeather = JSON.weather[0].main
     let feelsLike = JSON.main.feels_like
@@ -289,10 +337,63 @@ const searchByCityName = async (searchTerm) => {
     createChart()
     getWeeklyForecast(7)
 
-    const latitude = JSON.coord.lat
-    const longitude = JSON.coord.lon
-    loadMap(latitude, longitude)
+}
 
+function loadAPI2() {
+    console.log("This is loadAPI2 function.")
+}
+
+function loadAPI3() {
+    console.log("This is loadAPI3 function.")
+}
+
+
+function fromUnixToCurrent(unixTime, diffInHours) {
+
+    var date = new Date(unixTime * 1000);
+
+    // Return hours
+    if (date.getUTCHours() + diffInHours > 23) {
+        return date.getUTCHours() + diffInHours - 24
+    }
+    return date.getUTCHours() + diffInHours
+
+}
+
+async function HourlyApi3(latitude, longitude, UTCHour, diffInHours) {
+
+    const url = "https://api.open-meteo.com/v1/forecast?latitude=" + latitude + "&longitude=" + longitude + "&hourly=temperature_2m,precipitation,relative_humidity_2m&timezone=GMT&forecast_days=2&timeformat=unixtime"
+    let hourly3JSON = await ((await fetch(url)).json())
+
+    console.log(hourly3JSON)
+
+    console.log(hourly3JSON.hourly.temperature_2m[0])
+    console.log(hourly3JSON.hourly.time[0])
+
+    let currentHour = UTCHour + diffInHours
+
+    let api3HourlyValues = []
+    let api3HourlyLabels = []
+
+    let startIndex;
+
+    for (let i = 0; i < hourly3JSON.hourly.time.length; i++) {
+        if ((currentHour + 1) == fromUnixToCurrent(hourly3JSON.hourly.time[i], diffInHours) || (currentHour - 23) == fromUnixToCurrent(hourly3JSON.hourly.time[i], diffInHours)) {
+            startIndex = i;
+            break;
+        }
+    }
+    console.log(startIndex)
+    for (let i = startIndex; i < startIndex + 24; i++) {
+        api3HourlyValues.push(hourly3JSON.hourly.temperature_2m[i])
+        api3HourlyLabels.push(fromUnixToCurrent(hourly3JSON.hourly.time[i], diffInHours))
+    }
+
+    console.log(api3HourlyValues)
+    console.log(api3HourlyLabels)
+
+    hourlyDataTotal[2] = api3HourlyValues
+    console.log(hourlyDataTotal)
 }
 
 const searchByLatLong = async (latitude, longitude) => {
@@ -373,7 +474,9 @@ async function createChart() {
     console.log(owmHourlyValues)
     console.log(owmHourlyLabels)
 
+    hourlyDataTotal[0] = owmHourlyValues
 
+    hourlyDataTotal[1] = temperatures.hourlyDay[1]
 
     //Fetch Second API: Tomorrow IO API
     /*
@@ -403,6 +506,8 @@ async function createChart() {
     }
     console.log(tomHourlyValues)
     console.log(tomHourlyLabels)
+
+    hourlyDataTotal[1] = tomHourlyValues
     */
 
 
@@ -418,34 +523,32 @@ async function createChart() {
     console.log(omHourlyJSON)
 
 
-    let datasets = [
-            {
-                name: "Open Weather Map API",
-                values: owmHourlyValues
-            },
-            {
-                name: "predefined data",
-                values: temperatures.hourlyDay[1]
-                //name: "Tomorrow API",
-                //values: tomHourlyValues
+    let activeDatasets = []
+    //Add datasets of those providers which are selected
+    for (let i = 0; i < chartProviderSelector.children.length; i++) {
+        if (chartProviderSelector.children[i].selected == true) {
+            //exclude Tomorrow API hourly values when the unit is Kelvin
+            if(!(chartProviderSelector.children[i].value == "Tomorrow API" && selector.value == KELVIN)){
+                activeDatasets.push({
+                name: chartProviderSelector.children[i].value,
+                values: hourlyDataTotal[i]
+            })
             }
-        ]
-    //exclude 2nd API hourly values when the unit is Kelvin
-    if(selector.value == KELVIN){
-        datasets.pop()
+        }
     }
+    
 
     //build chart
     const hourlyChartData = {
         labels: owmHourlyLabels,
-        datasets: datasets
+        datasets: activeDatasets
     }
 
     const chart = new frappe.Chart("#hourly-chart", {
         data: hourlyChartData,
         type: 'line', // or 'bar', 'line', 'scatter', 'pie', 'percentage'
         height: 250,
-        colors: ['#7cd6fd', '#743ee2']
+        colors: ['#7cd6fd', '#743ee2', '#6495ED']
     })
 
 }
@@ -465,7 +568,7 @@ const getWeeklyForecast = async (numberOfDays) => {
     const h31 = document.createElement("h3")
     h31.innerText = "OpenWeatherMap"
     const api1Div = document.createElement("div")
-    api1Div.setAttribute("class","col")
+    api1Div.setAttribute("class", "col")
     api1Div.appendChild(h31)
 
     for (let i = 0; i < weeklyJSON.list.length; i++) {
@@ -499,7 +602,7 @@ const getWeeklyForecast = async (numberOfDays) => {
     const h32 = document.createElement("h3")
     h32.innerText = "Fake Data"
     const api2Div = document.createElement("div")
-    api2Div.setAttribute("class","col")
+    api2Div.setAttribute("class", "col")
     api2Div.appendChild(h32)
 
     for (let i = 0; i < weeklyJSON.list.length; i++) {
@@ -619,6 +722,7 @@ const loadMyIcon2 = (description, temperature, time) => {
         "broken clouds": "assets/cloud_sun.png",
         "shower rain": "assets/cloud_rain_sun.png",
         "rain": "assets/heavy_rain.png",
+        "heavy intensity rain": "assets/heavy_rain.png",
         "moderate rain": "assets/heavy_rain.png",
         "light rain": "assets/cloud_rain_sun.png",
         "thunderstorm": "assets/storm",

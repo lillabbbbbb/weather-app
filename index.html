@@ -41,12 +41,12 @@
     <header>
         <div id="header-div">
         </div>
-        <div class=" flex-grow-1 row main-col-div">
-            <section class=" border p-2 card-div">
+        <div class="animate-change center-card flex-grow-1 row ">
+            <section class="card-div">
                 <div id="last-visited">Last visited:</div>
                 <div id="favorites">Favorites:
                 </div>
-
+            </section>
         </div>
         <button id="geolocation">Use current location</button>
         <form action="submit">
@@ -56,7 +56,8 @@
         <p id="status"></p>
     </header>
     <main>
-        <section class="flex-grow-1 p-2 mb-2 main-col-div">
+        <div class="center-card">
+            <section class=" flex-grow-1 p-2 mb-2 main-col-div">
             <div class="card-div">
                 <p id="city">City</p>
                 <div><img id="current-icon" src="" alt=""></div>
@@ -75,6 +76,7 @@
                 </div>
             </div>
         </section>
+        </div>
         <input type="range" id="year-slider" min="1990" max="2024" value="2024" step="1">
         <button id="add-favorite">Favorite</button>
         <select id="select-metrics">
@@ -83,35 +85,30 @@
             <option value="K">Kelvin</option>
         </select>
 
-        <div id="chart-container-div" class="card-div flex-nowrap overflow-auto">
-            <select id="select-provider-chart">
-            <option>OpenWeatherMap</option>
-            <option>2nd API</option>
-            <option>3rd API</option>
-        </select>
-        <select id="select-weather-data">
-            <option>Temperature</option>
-            <option>Precip</option>
-            <option>Humidity</option>
-        </select>
+        <div id="chart-container-div" class="center-card card-div flex-nowrap overflow-auto">
+            <select id="select-provider-chart" multiple>
+                
+            </select>
+            <select id="select-weather-data">
+                <option>Temperature</option>
+                <option>Precip</option>
+                <option>Humidity</option>
+            </select>
             <p>Temperature forecast for the next 24 hours</p>
             <div id="hourly-chart"></div>
         </div>
-        <div class="card-div">
+        <div class="center-card card-div">
             <p>Next 7 days</p>
             <select name="" id="general-provider-selector">
-                <option value="0" selected>OpenWeatherMap</option>
-                <option value="1">2nd API</option>
-                <option value="2">3rd API</option>
             </select>
             <div id="div-weekly" class="card-div row">
-                    
+
             </div>
         </div>
         </div>
 
-        <aside class="flex-grow-1 mb-2 card-div main-col-div">
-            <div class="card-div" id="warnings">Warning!
+        <div class="center-card flex-grow-1 mb-2 card-div main-col-div">
+            <div id="warnings">Warning!
                 Lorem, ipsum dolor sit amet consectetur adipisicing elit. Quas quisquam id vero, eius natus
                 similique omnis corrupti ipsam accusamus quo dolor deleniti temporibus eligendi, laboriosam
                 in
