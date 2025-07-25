@@ -56,13 +56,13 @@ let runProviders = {
     "OpenMeteo": loadAPI3(),
 }
 let k = 0
-for (let [key, value] of Object.entries(runProviders)) {
+for (let i = 0; i < providerNames.length; i++) {
     let option1 = document.createElement("option")
-    option1.text = key
-    option1.setAttribute("value", k)
+    option1.text = providerNames[i]
+    option1.setAttribute("value", providerNames[i])
     generalProviderSelector.add(option1)
     let option2 = document.createElement("option")
-    option2.text = key
+    option2.text = providerNames[i]
     option2.selected = true
     chartProviderSelector.add(option2)
     k++
@@ -74,6 +74,7 @@ let hourlyDataTotal = [
     []
 ]
 
+/*
 let avgDataTotal = [
     [],
     [],
@@ -89,10 +90,9 @@ let maxDataTotal = [
     [],
     []
 ]
-let descriptionDataTotal = [
-    [],
-    [],
-    []
+*/
+let descriptionTotalArray = [
+
 ]
 
 
@@ -399,7 +399,7 @@ async function searchByCityName(searchTerm) {
 
 
     createChart()
-    getWeeklyForecast(latitude, longitude)
+    getWeeklyForecast(latitude, longitude, diffInHours)
 
 }
 
@@ -416,11 +416,13 @@ function fromUnixToCurrent(unixTime, diffInHours) {
 
     var date = new Date(unixTime * 1000);
 
+    let hour = date.getUTCHours() + diffInHours + 12
+
     // Return hours
-    if (date.getUTCHours() + diffInHours > 23) {
-        return date.getUTCHours() + diffInHours - 24
+    if (hour > 23) {
+        hour - 24
     }
-    return date.getUTCHours() + diffInHours
+    return hour
 
 }
 
@@ -677,11 +679,6 @@ async function getWeeklyAPI1(numberOfDays) {
 
     console.log(weeklyJSON.list)
 
-    let avgArray = []
-    let minArray = []
-    let maxArray = []
-    let descriptionArray = []
-
     for (let i = 0; i < weeklyJSON.list.length; i++) {
         console.log("This is iteration " + i + " in API " + apiNr)
         avg = weeklyJSON.list[i].temp.day
@@ -689,20 +686,36 @@ async function getWeeklyAPI1(numberOfDays) {
         max = weeklyJSON.list[i].temp.max
         description = weeklyJSON.list[i].weather[0].description
 
-        avgArray[i] = avg
-        minArray[i] = min
-        maxArray[i] = max
-        descriptionArray[i] = description
+        descriptionTotalArray[i] = description
 
-        console.log(descriptionArray)
+        const dayWidgetDiv = document.createElement("div")
+        dayWidgetDiv.setAttribute("class", "daily-f-card-div")
+        const dayDiv = document.createElement("div")
+        dayDiv.innerText = "Day " + (i + 1) + ": " + avg + selector.value
+        const minDiv = document.createElement("div")
+        minDiv.innerText = "Min: " + min + selector.value
+        const maxDiv = document.createElement("div")
+        maxDiv.innerText = "Max: " + max + selector.value
+
+        console.log(description)
+
+        const icon = document.createElement("img")
+        icon.src = loadMyIcon2(description)
+        icon.setAttribute("class", "daily-icon")
+        const p = document.createElement("p")
+        p.innerText = description
+
+        //dayWidgetDiv.setAttribute("background", setTheme(p, weeklyJSON.list[i].temp.day)."background")
+        dayWidgetDiv.appendChild(icon)
+        dayWidgetDiv.appendChild(p)
+        dayWidgetDiv.appendChild(dayDiv)
+        dayWidgetDiv.appendChild(minDiv)
+        dayWidgetDiv.appendChild(maxDiv)
+
+        weeklyDiv.appendChild(dayWidgetDiv)
+
     }
 
-    avgDataTotal[apiNr - 1] = avgArray
-    minDataTotal[apiNr - 1] = minArray
-    maxDataTotal[apiNr - 1] = maxArray
-    descriptionDataTotal[apiNr - 1] = descriptionArray
-
-    console.log(descriptionDataTotal[apiNr])
 }
 
 async function getWeeklyAPI2() {
@@ -714,10 +727,11 @@ async function getWeeklyAPI2() {
     const tomDailyJSON = await ((await (fetch(url2))).json())
     console.log(tomDailyJSON)
 
-    let avgArray = []
-    let minArray = []
-    let maxArray = []
-    let descriptionArray = []
+    while (weeklyDiv.lastElementChild) {
+        weeklyDiv.removeChild(weeklyDiv.lastElementChild)
+    }
+
+    let avg, min, max, description
 
     for (let i = 0; i < tomDailyJSON.timelines.daily.length; i++) {
         console.log("This is iteration " + i + " in API " + apiNr)
@@ -725,21 +739,51 @@ async function getWeeklyAPI2() {
         avg = tomDailyJSON.timelines.daily[i].values.temperatureAvg
         min = tomDailyJSON.timelines.daily[i].values.temperatureMin
         max = tomDailyJSON.timelines.daily[i].values.temperatureMax
-        description = dailyDataTotal[0][i][3]
+        description = descriptionTotalArray[i]
 
-        avgArray[i] = convert(avg, CELSIUS, selector.value)
-        minArray[i] = minArray = convert(min, CELSIUS, selector.value)
-        maxArray[i] = maxArray = convert(max, CELSIUS, selector.value)
-        descriptionArray[i] = description
+        avg = convert(avg, CELSIUS, selector.value)
+        min = convert(min, CELSIUS, selector.value)
+        max = convert(max, CELSIUS, selector.value)
+
+        const dayWidgetDiv = document.createElement("div")
+        dayWidgetDiv.setAttribute("class", "daily-f-card-div")
+        const dayDiv = document.createElement("div")
+        dayDiv.innerText = "Day " + (i + 1) + ": " + avg + selector.value
+        const minDiv = document.createElement("div")
+        minDiv.innerText = "Min: " + min + selector.value
+        const maxDiv = document.createElement("div")
+        maxDiv.innerText = "Max: " + max + selector.value
+
+        console.log(description)
+
+        const icon = document.createElement("img")
+        icon.src = loadMyIcon2(description)
+        icon.setAttribute("class", "daily-icon")
+        const p = document.createElement("p")
+        p.innerText = description
+
+        //dayWidgetDiv.setAttribute("background", setTheme(p, weeklyJSON.list[i].temp.day)."background")
+        dayWidgetDiv.appendChild(icon)
+        dayWidgetDiv.appendChild(p)
+        dayWidgetDiv.appendChild(dayDiv)
+        dayWidgetDiv.appendChild(minDiv)
+        dayWidgetDiv.appendChild(maxDiv)
+
+        weeklyDiv.appendChild(dayWidgetDiv)
     }
 
-    avgDataTotal[apiNr - 1] = avgArray
-    minDataTotal[apiNr - 1] = minArray
-    maxDataTotal[apiNr - 1] = maxArray
-    descriptionDataTotal[apiNr - 1] = descriptionArray
 }
 
-async function getWeeklyAPI3(latitude, longitude) {
+function findGreatest(array) {
+    return array.reduce((largest, current) =>
+        (current > largest ? current : largest), array[0]);
+}
+function findSmallest(array) {
+    return array.reduce((smallest, current) =>
+        (current < smallest ? current : smallest), array[0]);
+}
+
+async function getWeeklyAPI3(latitude, longitude, diffInHours) {
 
     let apiNr = 3
 
@@ -748,124 +792,110 @@ async function getWeeklyAPI3(latitude, longitude) {
     const JSON = await ((await (fetch(url3))).json())
     console.log(JSON)
 
-    let avgArray = []
-    let minArray = []
-    let maxArray = []
-    let descriptionArray = []
-
-    for (let i = 0; i < JSON; i++) {
-        console.log("This is iteration " + i + " in API " + apiNr)
-
-        avg = JSON.timelines.daily[i].values.temperatureAvg
-        min = JSON.timelines.daily[i].values.temperatureMin
-        max = JSON.timelines.daily[i].values.temperatureMax
-        description = dailyDataTotal[0][i][3]
-
-        avgArray[i] = convert(avg, CELSIUS, selector.value)
-        minArray[i] = convert(min, CELSIUS, selector.value)
-        maxArray[i] = convert(max, CELSIUS, selector.value)
-        descriptionArray[i] = description
-    }
-
-    avgDataTotal[apiNr - 1] = avgArray
-    minDataTotal[apiNr - 1] = minArray
-    maxDataTotal[apiNr - 1] = maxArray
-    descriptionDataTotal[apiNr - 1] = descriptionArray
-}
-
-function waitUntilReadyThenRun() {
-    const interval = setInterval(() => {
-        if (avgDataTotal[0].length > 0) {
-            clearInterval(interval);
-            getWeeklyForecast();
-        }
-    }, 100);
-}
-
-const getWeeklyForecast = async (latitude, longitude) => {
-
-
-
-    getWeeklyAPI1(forecastDaysNr)
-    getWeeklyAPI2()
-    getWeeklyAPI3(latitude, longitude)
-
-
     while (weeklyDiv.lastElementChild) {
         weeklyDiv.removeChild(weeklyDiv.lastElementChild)
     }
 
-    console.log(getUnits())
+    let temperatures = JSON.hourly.temperature_2m
+    let unixTimes = JSON.hourly.time
+    console.log(temperatures)
+    console.log(unixTimes)
 
-    let apiIndex = generalProviderSelector[generalProviderSelector.value].value
-
-    console.log(avgDataTotal)
-    console.log(avgDataTotal)
-    console.log(minDataTotal)
-    console.log(maxDataTotal)
-    console.log(descriptionDataTotal)
-
-    const executeForecast = () => {
-        console.log(avgDataTotal)
-        console.log(avgDataTotal)
-        console.log(minDataTotal)
-        console.log(maxDataTotal)
-        console.log(descriptionDataTotal)
-
-        console.log(apiIndex)
+    let min, max, description
 
 
-        let avg, min, max, description
+    let actualTimes = []
+    for (let i = 0; i < unixTimes.length; i++) {
+        //console.log(fromUnixToCurrent(unixTimes[i], diffInHours))
+        actualTimes[i] = fromUnixToCurrent(unixTimes[i], diffInHours)
+    }
+    console.log(actualTimes)
 
+    let minArray = [], maxArray = []
+    let k = 0
+    
+    for (let i = 0; i < temperatures.length; i += 24) {
+        //console.log(i)
+        if (actualTimes[i] == 0) {
 
-        for (let i = 0; i < forecastDaysNr; i++) {
-
-            console.log(i)
-            avg = avgDataTotal[apiIndex][i]
-            console.log(avg)
-            min = minDataTotal[apiIndex][i]
-            max = maxDataTotal[apiIndex][i]
-            console.log(max)
-            description = descriptionDataTotal[apiIndex][i]
-
-            const dayWidgetDiv = document.createElement("div")
-            dayWidgetDiv.setAttribute("class", "daily-f-card-div")
-            const dayDiv = document.createElement("div")
-            dayDiv.innerText = "Day " + (i + 1) + ": " + avg + selector.value
-            const minDiv = document.createElement("div")
-            minDiv.innerText = "Min: " + min + selector.value
-            const maxDiv = document.createElement("div")
-            maxDiv.innerText = "Max: " + max + selector.value
-
-            console.log(description)
-
-            const icon = document.createElement("img")
-            icon.src = loadMyIcon2(description)
-            icon.setAttribute("class", "daily-icon")
-            const p = document.createElement("p")
-            p.innerText = description
-
-            //dayWidgetDiv.setAttribute("background", setTheme(p, weeklyJSON.list[i].temp.day)."background")
-            dayWidgetDiv.appendChild(icon)
-            dayWidgetDiv.appendChild(p)
-            dayWidgetDiv.appendChild(dayDiv)
-            dayWidgetDiv.appendChild(minDiv)
-            dayWidgetDiv.appendChild(maxDiv)
-
-            weeklyDiv.appendChild(dayWidgetDiv)
+            let dayArray = []
+            //iterate all the values of one day 0-24
+            for (let j = i; j < i + 24; j++) {
+                dayArray.push(temperatures[j])
+            }
+            console.log(dayArray)
+            minArray[k] = convert(findGreatest(dayArray), CELSIUS, selector.value)
+            maxArray[k] = convert(findGreatest(dayArray), CELSIUS, selector.value)
+            k++
         }
     }
+    
+    console.log(minArray)
+    console.log(maxArray)
 
-    //waiting for the async stuff to finish up and actually fill the array
-    const interval = setInterval(() => {
-        if (avgDataTotal[apiIndex].length > 0) {
+    //convert to another metric if necessary
+    for (let i = 0; i < forecastDaysNr; i++) {
+
+        min = minArray[i]
+        console.log(min)
+        max = maxArray[i]
+        console.log(max)
+        description = descriptionTotalArray[i]
+
+        const dayWidgetDiv = document.createElement("div")
+        dayWidgetDiv.setAttribute("class", "daily-f-card-div")
+
+        /*
+        const dayDiv = document.createElement("div")
+        dayDiv.innerText = "Day " + (i + 1) + ": " + avg + selector.value
+        */
+        const minDiv = document.createElement("div")
+        minDiv.innerText = "Min: " + min + selector.value
+        const maxDiv = document.createElement("div")
+        maxDiv.innerText = "Max: " + max + selector.value
+
+        console.log(description)
+
+        const icon = document.createElement("img")
+        icon.src = loadMyIcon2(description)
+        icon.setAttribute("class", "daily-icon")
+        const p = document.createElement("p")
+        p.innerText = description
+
+        //dayWidgetDiv.setAttribute("background", setTheme(p, weeklyJSON.list[i].temp.day)."background")
+        dayWidgetDiv.appendChild(icon)
+        dayWidgetDiv.appendChild(p)
+        dayWidgetDiv.appendChild(minDiv)
+        dayWidgetDiv.appendChild(maxDiv)
+
+        weeklyDiv.appendChild(dayWidgetDiv)
+
+    }
+}
+
+
+const getWeeklyForecast = async (latitude, longitude, diffInHours) => {
+
+
+    console.log("Weekly data of API 1 is being loaded now.")
+    getWeeklyAPI1(forecastDaysNr)
+
+    //waiting for the async stuff to finish up and actually fill the global array. The interval notation is from ChatGPT
+    const interval = setInterval(async () => {
+        if (descriptionTotalArray.length > 0) {
             clearInterval(interval);
-            executeForecast();
+
+            console.log(generalProviderSelector.value)
+            if (generalProviderSelector.value == providerNames[1]) {
+                console.log("Weekly data of API 2 is ignored now.")
+                //getWeeklyAPI2()
+            }
+            else if (generalProviderSelector.value == providerNames[2]) {
+                getWeeklyAPI3(latitude, longitude, diffInHours)
+                console.log("Weekly data of API 3 is being loaded now.")
+            }
         }
     }, 100);
-
-
-
 }
 
 //returns path to the corresponding icon based on @description
