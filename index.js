@@ -7,7 +7,12 @@ const favDiv = document.getElementById("favorites")
 const lastVisitedDiv = document.getElementById("last-visited")
 const selector = document.getElementById("select-metrics")
 const weatherDataSelector = document.getElementById("select-weather-data")
+weatherDataSelector.disabled = true
 const chartProviderSelector = document.getElementById("select-provider-chart")
+const hourSlider = document.getElementById("hours-slider")
+hourSlider.min = 1
+hourSlider.max = 48
+hourSlider.value = 24
 const generalProviderSelector = document.getElementById("general-provider-selector")
 const weeklyDiv = document.getElementById("div-weekly")
 
@@ -20,6 +25,12 @@ const FAHRENHEIT = "°F"
 const KELVIN = "K"
 
 let forecastDaysNr = 7
+let forecastHours = hourSlider.value
+
+
+function getForecastHours() {
+    return hourSlider.value
+}
 
 let units = getUnits()
 let map;
@@ -156,6 +167,10 @@ function getUnits() {
     }
     return units
 }
+hourSlider.addEventListener("input", () => {
+    searchByCityName(searchArea.value)
+})
+
 selector.addEventListener("change", (e) => {
     selector.value = e.target.value
     searchByCityName(searchArea.value)
@@ -300,7 +315,7 @@ async function searchByCityName(searchTerm) {
 
 
     document.getElementById("city").innerText = JSON.name + ", " + JSON.sys.country
-    document.getElementById("unit").innerText = selector.value
+    //document.getElementById("unit").innerText = selector.value
     addToLastVisited(JSON.name)
     searchArea.value = JSON.name
     //let countryCode = JSON.sys.country
@@ -334,7 +349,7 @@ async function searchByCityName(searchTerm) {
     //Source: https://stackoverflow.com/questions/847185/convert-a-unix-timestamp-to-time-in-javascript
     // Create a new JavaScript Date object based on the timestamp
     // multiplied by 1000 so that the argument is in milliseconds, not seconds
-    var date = new Date(sunrise * 1000);
+    let date = new Date(sunrise * 1000);
 
     // Hours part from the timestamp
     var hours = date.getUTCHours() + diffInHours;
@@ -348,7 +363,7 @@ async function searchByCityName(searchTerm) {
     formattedSunrise = date.getHours() + ':' + minutes.substr(-2)
     console.log(formattedSunrise);
 
-    var date = new Date(sunset * 1000);
+    date = new Date(sunset * 1000);
 
     // Hours part from the timestamp
     var hours = date.getUTCHours() + diffInHours;
@@ -369,7 +384,10 @@ async function searchByCityName(searchTerm) {
     loadMap(latitude, longitude)
 
 
-    HourlyApi3(latitude, longitude, date.getUTCHours(), diffInHours)
+    date = new Date()
+    console.log(date.getUTCHours())
+
+    //HourlyApi3(latitude, longitude, date.getUTCHours(), diffInHours)
     //HourlyApi2(date.getUTCHours(), diffInHours)
 
 
@@ -382,7 +400,7 @@ async function searchByCityName(searchTerm) {
     let visibility = JSON.visibility / 1000
 
     document.getElementById("main-description").innerText = mainWeather + ", " + mainWeatherDescr
-    document.getElementById("feels-like").innerText = "Feels like " + feelsLike + selector.value
+    document.getElementById("feels-like").innerHTML = `Feels like: ${feelsLike}<sup>${selector.value}</sup>`
     document.getElementById("sunrise").innerText = "Sunrise: " + formattedSunrise
     document.getElementById("sunset").innerText = "Sunset: " + formattedSunset
     document.getElementById("humidity").innerText = "Humidity: " + humidity + "%"
@@ -395,7 +413,7 @@ async function searchByCityName(searchTerm) {
     document.getElementById("wind-deg").innerText = "Wind degree: " + windDegree + "°"
     document.getElementById("wind-speed").innerText = "Wind speed: " + windSpeed + "km/h"
 
-    document.getElementById("temperature").innerText = JSON.main.temp
+    document.getElementById("temperature").innerHTML = `${JSON.main.temp}<sup>${selector.value}</sup>`
 
 
     createChart()
@@ -416,12 +434,15 @@ function fromUnixToCurrent(unixTime, diffInHours) {
 
     var date = new Date(unixTime * 1000);
 
-    let hour = date.getUTCHours() + diffInHours + 12
+    let hour = date.getUTCHours() + diffInHours
+    console.log(date.getUTCHours())
 
     // Return hours
     if (hour > 23) {
-        hour - 24
+        hour -= 24
     }
+    console.log(hour)
+
     return hour
 
 }
@@ -463,6 +484,9 @@ function convert(value, previousMetric, newMetric) {
     else if (previousMetric == newMetric) {
         newValue = value
     }
+
+    newValue = newValue.toFixed(1)
+
     console.log(value + previousMetric + " has been changed to " + newValue + newMetric)
     return newValue
 }
@@ -486,7 +510,7 @@ async function HourlyApi2(UTCHour, diffInHours) {
 
     for (let i = 0; i < tomHourlyJSON.timelines.hourly.length; i++) {
         console.log(i + ":   hour = " + hour + ", tomHourlyJSON.timelines.hourly[i].time.substring(11,13) = " + tomHourlyJSON.timelines.hourly[i].time.substring(11, 13))
-        if ((hour + 1) == parseInt(tomHourlyJSON.timelines.hourly[i].time.substring(11, 13)) || (hour - 23) == parseInt(tomHourlyJSON.timelines.hourly[i].time.substring(11, 13))) {
+        if ((hour) == parseInt(tomHourlyJSON.timelines.hourly[i].time.substring(11, 13)) || (hour - 23) == parseInt(tomHourlyJSON.timelines.hourly[i].time.substring(11, 13))) {
             startIndex = i;
             break;
         }
@@ -534,6 +558,7 @@ async function HourlyApi3(latitude, longitude, UTCHour, diffInHours) {
     console.log(startIndex)
     for (let i = startIndex; i < startIndex + 24; i++) {
         api3HourlyValues.push(hourly3JSON.hourly.temperature_2m[i])
+        console.log(hourly3JSON.hourly.time[i] + ", " + diffInHours)
         api3HourlyLabels.push(fromUnixToCurrent(hourly3JSON.hourly.time[i], diffInHours))
     }
 
@@ -619,10 +644,21 @@ async function createChart() {
         }
     }
     console.log(startIndex)
-    for (let i = startIndex; i < startIndex + 24; i++) {
-        owmHourlyValues.push(hourlyJSON.list[i].main.temp)
-        owmHourlyLabels.push(hourlyJSON.list[i].dt_txt.substring(10, 13))
-    }
+
+    const interval = setInterval(async () => {
+        if (getForecastHours()) {
+            clearInterval(interval)
+            let forecastHours = getForecastHours()
+
+            console.log(getForecastHours())
+            for (let i = startIndex; i < startIndex + 24; i++) {
+                console.log(getForecastHours())
+                
+                owmHourlyValues.push(hourlyJSON.list[i].main.temp)
+                owmHourlyLabels.push(hourlyJSON.list[i].dt_txt.substring(10, 13))
+            }
+        }
+    }, 100);
 
     console.log(owmHourlyValues)
     console.log(owmHourlyLabels)
@@ -691,11 +727,11 @@ async function getWeeklyAPI1(numberOfDays) {
         const dayWidgetDiv = document.createElement("div")
         dayWidgetDiv.setAttribute("class", "daily-f-card-div")
         const dayDiv = document.createElement("div")
-        dayDiv.innerText = "Day " + (i + 1) + ": " + avg + selector.value
+        dayDiv.innerHTML = `Day ${i + 1}: ${avg}<sup>${selector.value}</sup>`
         const minDiv = document.createElement("div")
-        minDiv.innerText = "Min: " + min + selector.value
+        minDiv.innerHTML = `Min: ${min}<sup>${selector.value}</sup>`
         const maxDiv = document.createElement("div")
-        maxDiv.innerText = "Max: " + max + selector.value
+        maxDiv.innerHTML = `Max: ${max}<sup>${selector.value}</sup>`
 
         console.log(description)
 
@@ -748,11 +784,11 @@ async function getWeeklyAPI2() {
         const dayWidgetDiv = document.createElement("div")
         dayWidgetDiv.setAttribute("class", "daily-f-card-div")
         const dayDiv = document.createElement("div")
-        dayDiv.innerText = "Day " + (i + 1) + ": " + avg + selector.value
+        dayDiv.innerHTML = `Day ${i + 1}: ${avg}<sup>${selector.value}</sup>`
         const minDiv = document.createElement("div")
-        minDiv.innerText = "Min: " + min + selector.value
+        minDiv.innerHTML = `Min: ${min}<sup>${selector.value}</sup>`
         const maxDiv = document.createElement("div")
-        maxDiv.innerText = "Max: " + max + selector.value
+        maxDiv.innerHTML = `Max: ${max}<sup>${selector.value}</sup>`
 
         console.log(description)
 
@@ -813,23 +849,28 @@ async function getWeeklyAPI3(latitude, longitude, diffInHours) {
 
     let minArray = [], maxArray = []
     let k = 0
-    
-    for (let i = 0; i < temperatures.length; i += 24) {
-        //console.log(i)
-        if (actualTimes[i] == 0) {
 
+    for (let i = 0; i < temperatures.length; i) {
+        console.log(i + ": " + actualTimes[i])
+        if (actualTimes[i] == 0) {
+            console.log("Time is 0!")
             let dayArray = []
             //iterate all the values of one day 0-24
             for (let j = i; j < i + 24; j++) {
+                console.log(j)
                 dayArray.push(temperatures[j])
             }
             console.log(dayArray)
             minArray[k] = convert(findGreatest(dayArray), CELSIUS, selector.value)
             maxArray[k] = convert(findGreatest(dayArray), CELSIUS, selector.value)
             k++
+            i += 24
+        }
+        else {
+            i++
         }
     }
-    
+
     console.log(minArray)
     console.log(maxArray)
 
@@ -850,10 +891,9 @@ async function getWeeklyAPI3(latitude, longitude, diffInHours) {
         dayDiv.innerText = "Day " + (i + 1) + ": " + avg + selector.value
         */
         const minDiv = document.createElement("div")
-        minDiv.innerText = "Min: " + min + selector.value
+        maxDiv.innerHTML = `Min: ${min}<sup>${selector.value}</sup>`
         const maxDiv = document.createElement("div")
-        maxDiv.innerText = "Max: " + max + selector.value
-
+        maxDiv.innerHTML = `Max: ${max}<sup>${selector.value}</sup>`
         console.log(description)
 
         const icon = document.createElement("img")
@@ -891,8 +931,8 @@ const getWeeklyForecast = async (latitude, longitude, diffInHours) => {
                 //getWeeklyAPI2()
             }
             else if (generalProviderSelector.value == providerNames[2]) {
-                getWeeklyAPI3(latitude, longitude, diffInHours)
-                console.log("Weekly data of API 3 is being loaded now.")
+                //getWeeklyAPI3(latitude, longitude, diffInHours)
+                console.log("Weekly data of API 3 is ignored now.")
             }
         }
     }, 100);
@@ -1092,6 +1132,7 @@ const loadMap = async (lat, lon) => {
         }
 
         let layerControl = L.control.layers(baseMaps).addTo(map)
+        layerControl
 
     } else {
         console.log("New view set.")
@@ -1099,3 +1140,30 @@ const loadMap = async (lat, lon) => {
     }
 
 }
+
+
+/*
+//Tried to make button /select grabbable as a funny feature. Maybe next time
+  let offsetX = 0;
+  let offsetY = 0;
+  let isDragging = false;
+
+  document.querySelector("select").addEventListener("mousedown", (e) => {
+    isDragging = true;
+    offsetX = e.clientX - document.querySelector("select").offsetLeft;
+    offsetY = e.clientY - document.querySelector("select").offsetTop;
+    document.querySelector("select").style.cursor = "grabbing";
+  });
+
+  document.addEventListener("mousemove", (e) => {
+    if (!isDragging) return;
+    document.querySelector("select").style.left = `${e.clientX - offsetX}px`;
+    document.querySelector("select").style.top = `${e.clientY - offsetY}px`;
+  });
+
+  document.addEventListener("mouseup", () => {
+    isDragging = false;
+    document.querySelector("select").style.cursor = "grab";
+  });
+
+  */

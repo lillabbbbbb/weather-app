@@ -1,6 +1,6 @@
 :root {
     --main-color: #f0e06dd8;
-    --main-background-color: linear-gradient(45deg, #e0a70b 40%, #47a3ce);
+    --main-background-color: linear-gradient(45deg, #4b4330, #47a3ce, #f4f8b4);
     --card-background-light: rgba(255, 255, 255, var(--main-opacity));
     --card-background-dark: rgba(0, 0, 0, var(--main-opacity));
     --main-opacity: 0.4;
@@ -8,24 +8,23 @@
     --main-margin: 10px;
     --main-border-radius: 35px;
     --main-padding: 10px;
-    --basic-font-size: 10px;
+    --basic-font-size: 20px;
 }
 
 /*Values that are common for all screens, most importantly mobile phones*/
 
 #map {
-    height: 800px;
+    height: 400px;
 }
 
-html {
-    margin: 30;
-    padding: var(--main-padding);
-    background-color: black;
-    font-size: var(--basic-font-size);
-}
 
 h1 {
     display: inline-flex;
+}
+
+sup {
+    font-size: 0.6em;
+    vertical-align: super;
 }
 
 input.text {
@@ -37,7 +36,11 @@ input.text {
 
 }
 
-img {}
+html {
+    padding: var(--main-padding);
+    background-color: black;
+    font-size: var(--basic-font-size);
+}
 
 html,
 body {
@@ -66,6 +69,13 @@ table {
 
 }
 
+/* For dragging button
+button {
+    cursor: grab;
+    z-index: 1000;
+}
+    */
+
 button,
 select {
     background-color: rgb(204, 255, 245);
@@ -77,11 +87,13 @@ select {
     padding-right: 10px;
     font-family: 'Courier New', Courier, monospace;
     font-size: var(--basic-font-size);
+    margin: auto
 }
 
 div p {
     font-size: var(--basic-font-size);
 }
+
 
 button,
 select,
@@ -111,26 +123,16 @@ input {
 }
 
 
-#current-icon {
-    height: 150px;
-    float: left;
-    margin: 30px;
-}
-
 #temperature {
     font-size: 40px;
-    text-align: left;
+    text-align: center;
     vertical-align: middle;
 }
 
-#city,
-#country {
-    display: flex;
-}
 
 .center-card {
-   margin: auto;
-   padding-left: 10px;
+    margin: auto;
+    padding-left: 10px;
 }
 
 .animate-change {
@@ -150,12 +152,35 @@ input {
     transition: all 0.4s;
 }
 
+.transparent {
+    background-color: transparent;
+}
+
+#select-metrics {
+    margin-right: 0px;
+    position: relative;
+}
+
+
 .card-div:hover {
     transform: scale(1.008);
 }
 
 
-#current-icon
+button,
+select {
+    background: linear-gradient(20deg, #3b6294 20%, rgb(57, 144, 216));
+    border-color: #06283D;
+    margin: 5px;
+}
+
+input {
+    border-color: #06283D;
+    background: #06283D;
+    opacity: 0.8;
+    color: white;
+    padding: 10px;
+}
 
 /*Source: https://github.com/AsmrProg-YT/100-days-of-javascript/blob/master/Day%20%2310%20-%20Weather%20App/style.css */
 #weather-summary {
@@ -208,7 +233,7 @@ input {
 .daily-f-card-div {
     background-color: var(--main-color);
     border-radius: var(--main-border-radius);
-    margin: 0px 0px 10px 0px;
+    margin-top: 15px;
     padding-top: var(--main-padding);
     padding-bottom: var(--main-padding);
     border: thin;
@@ -237,12 +262,13 @@ input {
 
 #current-icon {
     height: 150px;
-    margin: 50px;
+    margin: auto;
     align-items: center;
 }
 
 .daily-icon {
     height: 80px;
+    align-items: left;
 }
 
 .daily-f-card-div {
@@ -391,15 +417,29 @@ input {
 @media (min-width: 1100px) {
 
     /*Layout for desktops*/
-    html, p, button, input, select {
-        font-size: calc(var(--basic-font-size) * 1.3);
+    html,
+    div,
+    p,
+    button,
+    input,
+    select {
+        font-size: calc(var(--basic-font-size) * 0.8);
     }
 
     div,
     section,
     aside {
-        max-width: 1300px;
-        font-size: calc(var(--basic-font-size) * 2);
+        max-width: 500px;
+        font-size: calc(var(--basic-font-size) * 0.5);
+    }
+
+    header{
+        max-width: calc(width);
+    }
+    header .center-card {
+        max-width: 2000px;
+        align-items: center;
+        font-size: calc(var(--basic-font-size) * 0.5);
     }
 
 }
