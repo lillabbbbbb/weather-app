@@ -47,7 +47,6 @@ body {
     text-align: center;
     font-family: Bahnschrift, 'DIN Alternate', 'Franklin Gothic Medium', 'Nimbus Sans Narrow', sans-serif-condensed, sans-serif;
     font-weight: normal;
-    max-width: auto;
     background: var(--main-background-color);
 }
 
@@ -57,16 +56,6 @@ footer {
 
 main div {
     padding: var(--main-padding);
-}
-
-h1,
-table {
-    size: 2rem;
-    margin: 20px;
-    border-radius: var(--main-border-radius);
-    border: thin;
-    border-color: black;
-
 }
 
 /* For dragging button
@@ -130,10 +119,6 @@ input {
 }
 
 
-.center-card {
-    margin: auto;
-    padding-left: 10px;
-}
 
 .animate-change {
     transition: all 0.4s;
@@ -429,17 +414,25 @@ input {
     div,
     section,
     aside {
-        max-width: 500px;
+
         font-size: calc(var(--basic-font-size) * 0.5);
     }
 
-    header{
-        max-width: calc(width);
+    header {
+        max-width: 3000px;
     }
+
     header .center-card {
         max-width: 2000px;
         align-items: center;
         font-size: calc(var(--basic-font-size) * 0.5);
+    }
+    .card-div {
+        margin: var(--main-margin);
+    }
+
+    .row {
+        max-width: 2000px;
     }
 
 }

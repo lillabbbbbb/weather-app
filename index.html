@@ -41,7 +41,7 @@
     <header>
         <div id="header-div">
         </div>
-        <div class="animate-change center-card flex-grow-1 row ">
+        <div class="animate-change flex-grow-1 row ">
             <section class="card-div">
                 <div id="last-visited">Last visited:</div>
                 <div id="favorites">Favorites:
@@ -55,21 +55,20 @@
         </form>
         <button id="add-favorite">Favorite</button>
         <select class="" id="select-metrics">
-                <option selected value="℃">Celsius</option>
-                <option value="°F">Fahrenheit</option>
-                <option value="K">Kelvin</option>
-            </select>
+            <option selected value="℃">Celsius</option>
+            <option value="°F">Fahrenheit</option>
+            <option value="K">Kelvin</option>
+        </select>
         <p id="status"></p>
     </header>
     <main>
-        <div class="center-card col-12 col-6-lg">
-            <section class=" flex-grow-1 p-2 mb-2 main-col-div">
-                <div class="card-div">
-                    <p id="city">City</p>
-                    <img id="current-icon">
-                    <p id="temperature"></p>
-                    <p id="unit"></p>
-                    <p id="main-description">Description</p>
+        <div class="row">
+            <div class=" col-12 col-md-4 card-div">
+                <p id="city">Location</p>
+                        <img id="current-icon" src="assets/question-sign.png">
+                        <p id="temperature"></p>
+                        <p id="unit"></p>
+                        <p id="main-description">Description</p>
                         <p id="feels-like">Feels like</p>
                         <p id="sunrise">Sunrise</p>
                         <p id="sunset">Sunset</p>
@@ -79,40 +78,34 @@
                         <p id="wind-deg">Wind degree</p>
                         <p id="wind-speed">Wind speed</p>
 
-                    <div id="weather-summary">
-                    
-                    </div>
+                        <div id="weather-summary">
+
+                        </div>
+            </div>
+            <div id="chart-container-div" class="col-12 col-md-4 card-div">
+                <input type="range" id="hours-slider" step="1">
+                <select id="select-provider-chart" multiple>
+
+                </select>
+                <select id="select-weather-data">
+                    <option>Temperature</option>
+                    <option>Precip</option>
+                    <option>Humidity</option>
+                </select>
+                <p>Temperature forecast for the next 24 hours</p>
+                <div id="hourly-chart"></div>
+            </div>
+            <div class="col-12 col-md-4 card-div">
+                <p>Next 7 days</p>
+                <select name="" id="general-provider-selector">
+                </select>
+                <div id="div-weekly" class=" row transparent">
+
                 </div>
-            </section>
-        </div>
-        <div class="center-card">
-            <input type="range" id="hours-slider" step="1">
-
-        </div>
-
-        <div id="chart-container-div" class="col-12 col-6-lg center-card card-div">
-            <select id="select-provider-chart" multiple>
-
-            </select>
-            <select id="select-weather-data">
-                <option>Temperature</option>
-                <option>Precip</option>
-                <option>Humidity</option>
-            </select>
-            <p>Temperature forecast for the next 24 hours</p>
-            <div id="hourly-chart"></div>
-        </div>
-        <div class="col-6-lg center-card card-div">
-            <p>Next 7 days</p>
-            <select name="" id="general-provider-selector">
-            </select>
-            <div id="div-weekly" class=" row transparent">
-
             </div>
         </div>
-        </div>
 
-        <div class="col-12 col-6-lg center-card flex-grow-1 mb-2 card-div main-col-div">
+        <div class="col-12 col-4-lg center-card flex-grow-1 mb-2 card-div main-col-div">
             <div id="warnings">Warning!
                 Lorem, ipsum dolor sit amet consectetur adipisicing elit. Quas quisquam id vero, eius natus
                 similique omnis corrupti ipsam accusamus quo dolor deleniti temporibus eligendi, laboriosam
