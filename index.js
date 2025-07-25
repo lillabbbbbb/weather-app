@@ -313,6 +313,47 @@ async function searchByCityName(searchTerm) {
     console.log(JSON)
     console.log("Searching for " + JSON.name)
 
+    //const date = new Date();
+    let diffInHours = JSON.timezone / 3600
+    //console.log(date.getUTCHours())
+    //console.log(diffInHours)
+    //const hour = date.getUTCHours() + diffInHours
+
+    let sunrise = JSON.sys.sunrise
+    let sunset = JSON.sys.sunset
+
+    //Source: https://stackoverflow.com/questions/847185/convert-a-unix-timestamp-to-time-in-javascript
+    // Create a new JavaScript Date object based on the timestamp
+    // multiplied by 1000 so that the argument is in milliseconds, not seconds
+    sunrise = new Date(sunrise * 1000);
+
+    // Hours part from the timestamp
+    var hours = sunrise.getUTCHours() + diffInHours;
+
+    // Minutes part from the timestamp
+    var minutes = "0" + sunrise.getMinutes();
+
+    sunrise.setHours(hours)
+
+    // Will display time in 10:30:23 format
+    formattedSunrise = sunrise.getHours() + ':' + minutes.substr(-2)
+    console.log(formattedSunrise);
+
+    sunset = new Date(sunset * 1000);
+
+    // Hours part from the timestamp
+    var hours = sunset.getUTCHours() + diffInHours;
+
+    // Minutes part from the timestamp
+    var minutes = "0" + sunset.getMinutes();
+
+    sunset.setHours(hours)
+
+    // Will display time in 10:30:23 format
+    formattedSunset = sunset.getHours() + ':' + minutes.substr(-2)
+    console.log(formattedSunset);
+
+
 
     document.getElementById("city").innerText = JSON.name + ", " + JSON.sys.country
     //document.getElementById("unit").innerText = selector.value
@@ -330,52 +371,10 @@ async function searchByCityName(searchTerm) {
     //testing
     //html[0].setAttribute("class", "stormy")
     //body[0].setAttribute("class", "stormy")
-    html[0].setAttribute("class", setTheme(JSON.weather[0].description, JSON.main.temp))
-    body[0].setAttribute("class", setTheme(JSON.weather[0].description, JSON.main.temp))
+    html[0].setAttribute("class", setTheme(JSON.weather[0].description, JSON.main.temp, sunrise, sunset, diffInHours))
+    body[0].setAttribute("class", setTheme(JSON.weather[0].description, JSON.main.temp, sunrise, sunset, diffInHours))
     //body[0].setAttribute("class", "test")
 
-
-
-
-    //const date = new Date();
-    let diffInHours = JSON.timezone / 3600
-    //console.log(date.getUTCHours())
-    //console.log(diffInHours)
-    //const hour = date.getUTCHours() + diffInHours
-
-    let sunrise = JSON.sys.sunrise
-    let sunset = JSON.sys.sunset
-
-    //Source: https://stackoverflow.com/questions/847185/convert-a-unix-timestamp-to-time-in-javascript
-    // Create a new JavaScript Date object based on the timestamp
-    // multiplied by 1000 so that the argument is in milliseconds, not seconds
-    let date = new Date(sunrise * 1000);
-
-    // Hours part from the timestamp
-    var hours = date.getUTCHours() + diffInHours;
-
-    // Minutes part from the timestamp
-    var minutes = "0" + date.getMinutes();
-
-    date.setHours(hours)
-
-    // Will display time in 10:30:23 format
-    formattedSunrise = date.getHours() + ':' + minutes.substr(-2)
-    console.log(formattedSunrise);
-
-    date = new Date(sunset * 1000);
-
-    // Hours part from the timestamp
-    var hours = date.getUTCHours() + diffInHours;
-
-    // Minutes part from the timestamp
-    var minutes = "0" + date.getMinutes();
-
-    date.setHours(hours)
-
-    // Will display time in 10:30:23 format
-    formattedSunset = date.getHours() + ':' + minutes.substr(-2)
-    console.log(formattedSunset);
 
 
 
@@ -384,7 +383,7 @@ async function searchByCityName(searchTerm) {
     loadMap(latitude, longitude)
 
 
-    date = new Date()
+    let date = new Date()
     console.log(date.getUTCHours())
 
     //HourlyApi3(latitude, longitude, date.getUTCHours(), diffInHours)
@@ -1016,8 +1015,8 @@ const loadMyIcon2 = (description, temperature, time) => {
     return iconPath
 }
 
-//sets matching color theme (through setting CSS classes to HTML tags) based on the current weather
-const setTheme = (description, temperature) => {
+//sets matching color theme (through setting CSS classes to HTML tags) based on the current weather and time of the day
+const setTheme = (description, temperature, sunrise, sunset, timeDiff) => {
 
     let themeClasses = {
         "sky is clear": "sunny",
@@ -1061,6 +1060,22 @@ const setTheme = (description, temperature) => {
     }
     console.log(temperature + " " + className)
 
+    //check whether it is night
+    let hourNow = (new Date()).getUTCHours() + timeDiff
+    if(hourNow > 24){
+        hourNow -= 24
+    }
+    let minsNow = (new Date()).getUTCMinutes()
+    console.log(hourNow)
+    console.log(minsNow)
+    console.log(hourNow < sunrise.getHours())
+    console.log(hourNow = sunrise.getHours() && minsNow < sunrise.getMinutes())
+    console.log(hourNow = sunset.getHours() && minsNow > sunset.getMinutes())
+    console.log(hourNow > sunset.getHours())
+    if((hourNow < sunrise.getHours()) || (hourNow = sunrise.getHours() && minsNow < sunrise.getMinutes())|| (hourNow = sunset.getHours() && minsNow > sunset.getMinutes()) || (hourNow > sunset.getHours())){
+        className = "night"
+    }
+    console.log(className)
 
     return className
 }

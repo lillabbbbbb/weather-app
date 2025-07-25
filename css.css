@@ -393,6 +393,51 @@ input {
     }
 }
 
+.night {
+    background: linear-gradient(60deg, rgb(1, 15, 39) 60%, #021f43);
+    color: white;
+
+    button,
+    select {
+        color: white;
+        background: linear-gradient(10deg, rgb(2, 29, 52), #042f64, #407ec9);
+        border-color: #134885;
+        box-shadow: 0px 0px 50px 0px #ffffff22;
+        margin: 5px;
+    }
+
+    select option {
+        background-color: transparent;
+        color: white;
+    }
+    option:hover {
+        background: #058572;
+        color: white;
+    }
+    select:hover {
+        background-color: #021f43;
+        color: white;
+    }
+
+    input {
+        border-color: #134885;
+        background: #25516d;
+        opacity: 0.5;
+        color: white;
+        padding: 10px;
+    }
+
+    .card-div {
+        background-color: var(--card-background-dark);
+        box-shadow: 0px 0px 50px 0px #ffffff22;
+    }
+
+    .daily-f-card-div {
+        background: linear-gradient(10deg, rgb(2, 29, 52), #042f64, #12498b);
+    }
+
+}
+
 
 @media (min-width: 480px) {
     /*Layout or tablets*/
@@ -402,6 +447,7 @@ input {
 @media (min-width: 1100px) {
 
     /*Layout for desktops*/
+
     html,
     div,
     p,
@@ -427,6 +473,7 @@ input {
         align-items: center;
         font-size: calc(var(--basic-font-size) * 0.5);
     }
+
     .card-div {
         margin: var(--main-margin);
     }
