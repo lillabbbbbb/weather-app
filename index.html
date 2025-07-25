@@ -62,27 +62,27 @@
         <p id="status"></p>
     </header>
     <main>
-        <div class="row">
-            <div class=" col-12 col-md-4 card-div">
+        <div class="row justify-content-center align-self-start">
+            <div class=" col-12 col-md-4 card-div  align-self-start">
                 <p id="city">Location</p>
-                        <img id="current-icon" src="assets/question-sign.png">
-                        <p id="temperature"></p>
-                        <p id="unit"></p>
-                        <p id="main-description">Description</p>
-                        <p id="feels-like">Feels like</p>
-                        <p id="sunrise">Sunrise</p>
-                        <p id="sunset">Sunset</p>
-                        <p id="humidity">Humidity</p>
-                        <p id="pressure">Pressure</p>
-                        <p id="visibility">Visibility</p>
-                        <p id="wind-deg">Wind degree</p>
-                        <p id="wind-speed">Wind speed</p>
+                <img id="current-icon" src="assets/question-sign.png">
+                <p id="temperature"></p>
+                <p id="unit"></p>
+                <p id="main-description">Description</p>
+                <p id="feels-like">Feels like</p>
+                <p id="sunrise">Sunrise</p>
+                <p id="sunset">Sunset</p>
+                <p id="humidity">Humidity</p>
+                <p id="pressure">Pressure</p>
+                <p id="visibility">Visibility</p>
+                <p id="wind-deg">Wind degree</p>
+                <p id="wind-speed">Wind speed</p>
 
-                        <div id="weather-summary">
+                <div id="weather-summary">
 
-                        </div>
+                </div>
             </div>
-            <div id="chart-container-div" class="col-12 col-md-4 card-div">
+            <div class="col-12 col-md-5 card-div  align-self-start">
                 <input type="range" id="hours-slider" step="1">
                 <select id="select-provider-chart" multiple>
 
@@ -93,9 +93,14 @@
                     <option>Humidity</option>
                 </select>
                 <p>Temperature forecast for the next 24 hours</p>
-                <div id="hourly-chart"></div>
+                <div id="chart-container-div" class="card-div">
+                    <div id="hourly-chart"></div>
+                </div>
             </div>
-            <div class="col-12 col-md-4 card-div">
+        </div>
+        <div class="row justify-content-center align-self-start">
+
+            <div class="col-12 col-md-auto card-div  align-self-start">
                 <p>Next 7 days</p>
                 <select name="" id="general-provider-selector">
                 </select>
@@ -103,15 +108,11 @@
 
                 </div>
             </div>
+
         </div>
 
-        <div class="col-12 col-4-lg center-card flex-grow-1 mb-2 card-div main-col-div">
-            <div id="warnings">Warning!
-                Lorem, ipsum dolor sit amet consectetur adipisicing elit. Quas quisquam id vero, eius natus
-                similique omnis corrupti ipsam accusamus quo dolor deleniti temporibus eligendi, laboriosam
-                in
-                blanditiis itaque impedit iste.
-            </div>
+
+        <div class="row col-12 col-md-12 center-card m-2 card-div">
             <div id="map"></div>
         </div>
         </div>

@@ -1,6 +1,9 @@
 :root {
     --main-color: #f0e06dd8;
-    --main-background-color: linear-gradient(45deg, #4b4330, #47a3ce, #f4f8b4);
+    --main-background-color: 
+        linear-gradient(red, transparent),
+        linear-gradient(to top left, lime, transparent),
+        linear-gradient(to top right, blue, transparent);
     --card-background-light: rgba(255, 255, 255, var(--main-opacity));
     --card-background-dark: rgba(0, 0, 0, var(--main-opacity));
     --main-opacity: 0.4;
@@ -89,8 +92,10 @@ select,
 input,
 p,
 h1,
-img {
-    transition: all 0.4s;
+img,
+.card-div,
+.daily-f-card-div {
+    transition: all 0.5s;
     font-size: var(--basic-font-size);
 }
 
@@ -100,6 +105,14 @@ input:hover,
 p:hover,
 h1:hover,
 img:hover {
+    transform: scale(1.1);
+}
+
+.card-div:hover {
+    transform: scale(1.008);
+}
+
+.daily-f-card-div:hover {
     transform: scale(1.1);
 }
 
@@ -146,10 +159,6 @@ input {
     position: relative;
 }
 
-
-.card-div:hover {
-    transform: scale(1.008);
-}
 
 
 button,
@@ -219,10 +228,15 @@ input {
     background-color: var(--main-color);
     border-radius: var(--main-border-radius);
     margin-top: 15px;
+
     padding-top: var(--main-padding);
     padding-bottom: var(--main-padding);
     border: thin;
     border-color: black;
+}
+
+.daily-f-card-div p {
+    color: black;
 }
 
 #chart-container-div {
@@ -318,7 +332,24 @@ input {
 }
 
 
-.sunny-cloudy {}
+.sunny-cloudy {
+    background: linear-gradient(45deg, #4b4330, #47a3ce, #f4f8b4);
+    color: black;
+
+    button,
+    select {
+        background: linear-gradient(20deg, #66a9bdd8 20%, rgb(243, 240, 88));
+        border-color: #06283D;
+        margin: 5px;
+    }
+
+    input {
+        border-color: #06283D;
+        background: #06283D;
+        color: white;
+        padding: 10px;
+    }
+}
 
 .cloudy {
     background: linear-gradient(30deg, rgb(90, 132, 167) 70%, #b0cfe9);
@@ -410,10 +441,12 @@ input {
         background-color: transparent;
         color: white;
     }
+
     option:hover {
-        background: #058572;
+        background: #040e51aa;
         color: white;
     }
+
     select:hover {
         background-color: #021f43;
         color: white;
@@ -434,6 +467,10 @@ input {
 
     .daily-f-card-div {
         background: linear-gradient(10deg, rgb(2, 29, 52), #042f64, #12498b);
+    }
+
+    .daily-f-card-div p {
+        color: white;
     }
 
 }
@@ -469,7 +506,7 @@ input {
     }
 
     header .center-card {
-        max-width: 2000px;
+        max-width: 3000px;
         align-items: center;
         font-size: calc(var(--basic-font-size) * 0.5);
     }
@@ -480,6 +517,12 @@ input {
 
     .row {
         max-width: 2000px;
+    }
+
+    .daily-f-card-div {
+        width: fit-content;
+        margin-left: 5px;
+        margin-right: 5px;
     }
 
 }

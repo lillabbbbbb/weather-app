@@ -362,7 +362,7 @@ async function searchByCityName(searchTerm) {
     //let countryCode = JSON.sys.country
     //document.getElementById("country").innerText = countryCode
 
-    currentIconImg.src = loadMyIcon(JSON.weather[0].description)
+    currentIconImg.src = loadMyIcon(JSON.weather[0].description, JSON.main.temp, sunrise, sunset, diffInHours)
     currentIconImg.setAttribute("class", "current-icon")
 
     //set theme based on weather
@@ -725,17 +725,17 @@ async function getWeeklyAPI1(numberOfDays) {
 
         const dayWidgetDiv = document.createElement("div")
         dayWidgetDiv.setAttribute("class", "daily-f-card-div")
-        const dayDiv = document.createElement("div")
-        dayDiv.innerHTML = `Day ${i + 1}: ${avg}<sup>${selector.value}</sup>`
-        const minDiv = document.createElement("div")
-        minDiv.innerHTML = `Min: ${min}<sup>${selector.value}</sup>`
-        const maxDiv = document.createElement("div")
-        maxDiv.innerHTML = `Max: ${max}<sup>${selector.value}</sup>`
+        const dayP = document.createElement("p")
+        dayP.innerHTML = `Day ${i + 1}: ${avg}<sup>${selector.value}</sup>`
+        const minP = document.createElement("p")
+        minP.innerHTML = `Min: ${min}<sup>${selector.value}</sup>`
+        const maxP = document.createElement("p")
+        maxP.innerHTML = `Max: ${max}<sup>${selector.value}</sup>`
 
         console.log(description)
 
         const icon = document.createElement("img")
-        icon.src = loadMyIcon2(description)
+        icon.src = loadMyIcon2(description, max)
         icon.setAttribute("class", "daily-icon")
         const p = document.createElement("p")
         p.innerText = description
@@ -743,9 +743,9 @@ async function getWeeklyAPI1(numberOfDays) {
         //dayWidgetDiv.setAttribute("background", setTheme(p, weeklyJSON.list[i].temp.day)."background")
         dayWidgetDiv.appendChild(icon)
         dayWidgetDiv.appendChild(p)
-        dayWidgetDiv.appendChild(dayDiv)
-        dayWidgetDiv.appendChild(minDiv)
-        dayWidgetDiv.appendChild(maxDiv)
+        dayWidgetDiv.appendChild(dayP)
+        dayWidgetDiv.appendChild(minP)
+        dayWidgetDiv.appendChild(maxP)
 
         weeklyDiv.appendChild(dayWidgetDiv)
 
@@ -780,19 +780,19 @@ async function getWeeklyAPI2() {
         min = convert(min, CELSIUS, selector.value)
         max = convert(max, CELSIUS, selector.value)
 
-        const dayWidgetDiv = document.createElement("div")
+        const dayWidgetDiv = document.createElement("p")
         dayWidgetDiv.setAttribute("class", "daily-f-card-div")
-        const dayDiv = document.createElement("div")
-        dayDiv.innerHTML = `Day ${i + 1}: ${avg}<sup>${selector.value}</sup>`
-        const minDiv = document.createElement("div")
-        minDiv.innerHTML = `Min: ${min}<sup>${selector.value}</sup>`
-        const maxDiv = document.createElement("div")
-        maxDiv.innerHTML = `Max: ${max}<sup>${selector.value}</sup>`
+        const dayP = document.createElement("p")
+        dayP.innerHTML = `Day ${i + 1}: ${avg}<sup>${selector.value}</sup>`
+        const minP = document.createElement("p")
+        minP.innerHTML = `Min: ${min}<sup>${selector.value}</sup>`
+        const maxP = document.createElement("p")
+        maxP.innerHTML = `Max: ${max}<sup>${selector.value}</sup>`
 
         console.log(description)
 
         const icon = document.createElement("img")
-        icon.src = loadMyIcon2(description)
+        icon.src = loadMyIcon2(description, max)
         icon.setAttribute("class", "daily-icon")
         const p = document.createElement("p")
         p.innerText = description
@@ -800,9 +800,9 @@ async function getWeeklyAPI2() {
         //dayWidgetDiv.setAttribute("background", setTheme(p, weeklyJSON.list[i].temp.day)."background")
         dayWidgetDiv.appendChild(icon)
         dayWidgetDiv.appendChild(p)
-        dayWidgetDiv.appendChild(dayDiv)
-        dayWidgetDiv.appendChild(minDiv)
-        dayWidgetDiv.appendChild(maxDiv)
+        dayWidgetDiv.appendChild(dayP)
+        dayWidgetDiv.appendChild(minP)
+        dayWidgetDiv.appendChild(maxP)
 
         weeklyDiv.appendChild(dayWidgetDiv)
     }
@@ -861,7 +861,7 @@ async function getWeeklyAPI3(latitude, longitude, diffInHours) {
             }
             console.log(dayArray)
             minArray[k] = convert(findGreatest(dayArray), CELSIUS, selector.value)
-            maxArray[k] = convert(findGreatest(dayArray), CELSIUS, selector.value)
+            maxArray[k] = convert(findSmallest(dayArray), CELSIUS, selector.value)
             k++
             i += 24
         }
@@ -885,18 +885,18 @@ async function getWeeklyAPI3(latitude, longitude, diffInHours) {
         const dayWidgetDiv = document.createElement("div")
         dayWidgetDiv.setAttribute("class", "daily-f-card-div")
 
-        /*
-        const dayDiv = document.createElement("div")
-        dayDiv.innerText = "Day " + (i + 1) + ": " + avg + selector.value
-        */
-        const minDiv = document.createElement("div")
-        maxDiv.innerHTML = `Min: ${min}<sup>${selector.value}</sup>`
-        const maxDiv = document.createElement("div")
-        maxDiv.innerHTML = `Max: ${max}<sup>${selector.value}</sup>`
+        
+        const dayP = document.createElement("p")
+        dayP.innerText = "Day " + (i + 1)
+        
+        const minP = document.createElement("p")
+        minP.innerHTML = `Min: ${min}<sup>${selector.value}</sup>`
+        const maxP = document.createElement("p")
+        maxP.innerHTML = `Max: ${max}<sup>${selector.value}</sup>`
         console.log(description)
 
         const icon = document.createElement("img")
-        icon.src = loadMyIcon2(description)
+        icon.src = loadMyIcon2(description, max)
         icon.setAttribute("class", "daily-icon")
         const p = document.createElement("p")
         p.innerText = description
@@ -904,8 +904,9 @@ async function getWeeklyAPI3(latitude, longitude, diffInHours) {
         //dayWidgetDiv.setAttribute("background", setTheme(p, weeklyJSON.list[i].temp.day)."background")
         dayWidgetDiv.appendChild(icon)
         dayWidgetDiv.appendChild(p)
-        dayWidgetDiv.appendChild(minDiv)
-        dayWidgetDiv.appendChild(maxDiv)
+        dayWidgetDiv.appendChild(dayP)
+        dayWidgetDiv.appendChild(minP)
+        dayWidgetDiv.appendChild(maxP)
 
         weeklyDiv.appendChild(dayWidgetDiv)
 
@@ -937,42 +938,10 @@ const getWeeklyForecast = async (latitude, longitude, diffInHours) => {
     }, 100);
 }
 
-//returns path to the corresponding icon based on @description
-const loadMyIcon = (description) => {
+//returns path to the corresponding day or night icon
+const loadMyIcon = (description, temperature, sunrise, sunset, timeDiff) => {
 
-    icons = {
-        cloudRainSun: "assets/cloud_rain_sun.png",
-        cloudWindSun: "assets/cloud_wind_sun.png",
-        cloudSun: "assets/cloud_sun.png",
-        hot: "assets/hot.png",
-        snow: "assets/snowflake.png",
-        sun: "assets/sun.png",
-        storm: "assets/storm",
-        cloud: "assets/cloud.png"
-    }
-
-    description = description.toLowerCase()
-
-    if (description.includes("snow")) {
-        return icons.snow
-    }
-    else if (description.includes("storm")) {
-        return icons.storm
-    } else if (description.includes("cloud")) {
-        return icons.cloud
-    } else if (description.includes("rain")) {
-        return icons.cloudRainSun
-    } else if (description.includes("sun") || description.includes("clear")) {
-        return icons.sun
-    }
-}
-
-/*
-    @time: time of the day in hours (e.g. 14)
- */
-const loadMyIcon2 = (description, temperature, time) => {
-
-    iconPaths = {
+    let iconPathsDay = {
         "sky is clear": "assets/sun.png",
         "clear sky": "assets/sun.png",
         "few clouds": "assets/cloud_sun.png",
@@ -984,13 +953,98 @@ const loadMyIcon2 = (description, temperature, time) => {
         "heavy intensity rain": "assets/heavy_rain.png",
         "moderate rain": "assets/heavy_rain.png",
         "light rain": "assets/cloud_rain_sun.png",
-        "thunderstorm": "assets/storm",
+        "thunderstorm": "assets/storm.png",
         "snow": "assets/snowflake.png",
         "mist": "assets/mist.png",
+    }
 
+    let iconPathsNight = {
+        "sky is clear": "assets/moon.png",
+        "clear sky": "assets/moon.png",
+        "few clouds": "assets/cloud_night.png",
+        "scattered clouds": "assets/cloud_night.png",
+        "overcast clouds": "assets/cloud_night.png",
+        "broken clouds": "assets/cloud_night.png",
+        "shower rain": "assets/rain_night.png",
+        "rain": "assets/rain_night.png",
+        "heavy intensity rain": "assets/rain_night.png",
+        "moderate rain": "assets/rain_night.png",
+        "light rain": "assets/rain_night.png",
+        "thunderstorm": "assets/storm_night.png",
+        "snow": "assets/snow_night.png",
+        "mist": "assets/mist.png",
+    }
+
+    //check whether it is night
+    let night = false
+    let date = new Date()
+    date.setHours(date.getHours() + timeDiff - 1)
+    console.log(date < sunrise)
+    console.log(date > sunset)
+    console.log(date)
+    console.log(sunrise)
+    console.log(sunset)
+    if((date < sunrise) || date > sunset){
+        night = true
     }
 
     let iconPath;
+    let paths
+    if(night){
+        paths = iconPathsNight
+    }else{
+        paths = iconPathsDay
+    }
+
+    for (let [key, value] of Object.entries(paths)) {
+        //console.log(`${key}: ${value}`);
+        //console.log("Description: " + description)
+        if (description == key) {
+            iconPath = value
+            //console.log(key)
+            break
+        }
+        //console.log("Suitable icon not found.")
+    }
+
+    //check for hot temperature
+    const HOT_TEMP_CELS = 35
+    const HOT_TEMP_FAHR = HOT_TEMP_CELS * (9 / 5) + 32
+    const HOT_TEMP_KELV = HOT_TEMP_CELS + 273.15
+    if ((selector.value == CELSIUS && temperature >= HOT_TEMP_CELS) || (selector.value == FAHRENHEIT && temperature >= HOT_TEMP_FAHR) || (selector.value == KELVIN && temperature >= HOT_TEMP_KELV)) {
+        if(night){
+            iconPath = "assets/hot_night.png"
+        }else{
+            iconPath = "assets/hot.png"
+        }
+    }
+
+    return iconPath
+}
+
+/*
+    @time: time of the day in hours (e.g. 14)
+ */
+const loadMyIcon2 = (description, temperature) => {
+
+    let iconPaths = {
+        "sky is clear": "assets/sun.png",
+        "clear sky": "assets/sun.png",
+        "few clouds": "assets/cloud_sun.png",
+        "scattered clouds": "assets/cloud.png",
+        "overcast clouds": "assets/cloud.png",
+        "broken clouds": "assets/cloud_sun.png",
+        "shower rain": "assets/cloud_rain_sun.png",
+        "rain": "assets/heavy_rain.png",
+        "heavy intensity rain": "assets/heavy_rain.png",
+        "moderate rain": "assets/heavy_rain.png",
+        "light rain": "assets/cloud_rain_sun.png",
+        "thunderstorm": "assets/storm.png",
+        "snow": "assets/snowflake.png",
+        "mist": "assets/mist.png",
+    }
+
+    let iconPath
 
     for (let [key, value] of Object.entries(iconPaths)) {
         //console.log(`${key}: ${value}`);
@@ -1009,8 +1063,8 @@ const loadMyIcon2 = (description, temperature, time) => {
     const HOT_TEMP_KELV = HOT_TEMP_CELS + 273.15
     if ((selector.value == CELSIUS && temperature >= HOT_TEMP_CELS) || (selector.value == FAHRENHEIT && temperature >= HOT_TEMP_FAHR) || (selector.value == KELVIN && temperature >= HOT_TEMP_KELV)) {
         iconPath = "assets/hot.png"
+        console.log("This city is hot!!")
     }
-
 
     return iconPath
 }
@@ -1021,7 +1075,7 @@ const setTheme = (description, temperature, sunrise, sunset, timeDiff) => {
     let themeClasses = {
         "sky is clear": "sunny",
         "clear sky": "sunny",
-        "few clouds": "cloudy",
+        "few clouds": "sunny-cloudy",
         "scattered clouds": "cloudy",
         "overcast clouds": "cloudy",
         "broken clouds": "assets/cloud_sun.png",
@@ -1061,6 +1115,17 @@ const setTheme = (description, temperature, sunrise, sunset, timeDiff) => {
     console.log(temperature + " " + className)
 
     //check whether it is night
+    let date = new Date()
+    date.setHours(date.getHours() + timeDiff - 1)
+    console.log(date < sunrise)
+    console.log(date > sunset)
+    console.log(date)
+    console.log(sunrise)
+    console.log(sunset)
+    if((date < sunrise) || date > sunset){
+        className = "night"
+    }
+    /*
     let hourNow = (new Date()).getUTCHours() + timeDiff
     if(hourNow > 24){
         hourNow -= 24
@@ -1068,13 +1133,16 @@ const setTheme = (description, temperature, sunrise, sunset, timeDiff) => {
     let minsNow = (new Date()).getUTCMinutes()
     console.log(hourNow)
     console.log(minsNow)
-    console.log(hourNow < sunrise.getHours())
+    console.log(hourNow < sunrise.getHours() + timeDiff)
     console.log(hourNow = sunrise.getHours() && minsNow < sunrise.getMinutes())
+    console.log(sunrise.getHours() + timeDiff)
     console.log(hourNow = sunset.getHours() && minsNow > sunset.getMinutes())
+    console.log(sunset.getHours())
     console.log(hourNow > sunset.getHours())
     if((hourNow < sunrise.getHours()) || (hourNow = sunrise.getHours() && minsNow < sunrise.getMinutes())|| (hourNow = sunset.getHours() && minsNow > sunset.getMinutes()) || (hourNow > sunset.getHours())){
         className = "night"
     }
+    */
     console.log(className)
 
     return className
@@ -1125,29 +1193,38 @@ const loadMap = async (lat, lon) => {
 
         let temp = L.tileLayer('http://maps.openweathermap.org/maps/2.0/weather/TA2/{z}/{x}/{y}?opacity=0.6&fill_bound=true&appid=' + apiKey1, {
             attribution: '&copy; <a href="https://openweathermap.org/api/weather-map-2">OpenWeatherMap</a> contributors'
-        }).addTo(map);
-
+        }).addTo(map)
+    
         let precip = L.tileLayer('http://maps.openweathermap.org/maps/2.0/weather/PA0/{z}/{x}/{y}?opacity=0.7&fill_bound=true&appid=' + apiKey1, {
             attribution: '&copy; <a href="https://openweathermap.org/api/weather-map-2">OpenWeatherMap</a> contributors'
         })
+    
+
         let pressure = L.tileLayer('http://maps.openweathermap.org/maps/2.0/weather/APM/{z}/{x}/{y}?opacity=0.6&fill_bound=true&appid=' + apiKey1, {
             attribution: '&copy; <a href="https://openweathermap.org/api/weather-map-2">OpenWeatherMap</a> contributors'
         })
+    
+
         let wind = L.tileLayer('http://maps.openweathermap.org/maps/2.0/weather/WND/{z}/{x}/{y}?opacity=0.6&fill_bound=true&appid=' + apiKey1, {
             attribution: '&copy; <a href="https://openweathermap.org/api/weather-map-2">OpenWeatherMap</a> contributors'
         });
+    
 
-
+        let baseMapsData = {
+            "Temperature Map": temp,
+            "Precipitation": precip,
+            "Pressure": pressure,
+            "Wind": wind,
+        }
 
         let baseMaps = {
-            "TempMap": temp,
+            "Temperature Map": temp,
             "Precipitation": precip,
             "Pressure": pressure,
             "Wind": wind,
         }
 
         let layerControl = L.control.layers(baseMaps).addTo(map)
-        layerControl
 
     } else {
         console.log("New view set.")
