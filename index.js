@@ -361,14 +361,16 @@ async function searchByCityName(searchTerm) {
     html[0].setAttribute("class", setTheme(JSON.weather[0].description, JSON.main.temp, sunrise, sunset, diffInHours))
     body[0].setAttribute("class", setTheme(JSON.weather[0].description, JSON.main.temp, sunrise, sunset, diffInHours))
 
+
+    let date = new Date()
     
     const latitude = JSON.coord.lat
     const longitude = JSON.coord.lon
     loadMap(latitude, longitude)
 
     //Load hourly forecast of API 2 and 3. The number of free API calls is pretty limited, so you can comment these two lines out when not essential
-    //HourlyApi3(latitude, longitude, date.getUTCHours(), diffInHours)
-    //HourlyApi2(date.getUTCHours(), diffInHours)
+    HourlyApi3(latitude, longitude, date.getUTCHours(), diffInHours)
+    HourlyApi2(date.getUTCHours(), diffInHours)
 
     //Display various details about the current weather
     let mainWeatherDescr = JSON.weather[0].description
@@ -458,8 +460,8 @@ const searchByLatLong = async (latitude, longitude) => {
     loadMap(latitude, longitude)
 
     //Load hourly forecast of API 2 and 3. The number of free API calls is pretty limited, so you can comment these two lines out when not essential
-    //HourlyApi3(latitude, longitude, date.getUTCHours(), diffInHours)
-    //HourlyApi2(date.getUTCHours(), diffInHours)
+    HourlyApi3(latitude, longitude, date.getUTCHours(), diffInHours)
+    HourlyApi2(date.getUTCHours(), diffInHours)
 
     //Display various details about the current weather
     let mainWeatherDescr = JSON.weather[0].description
@@ -957,12 +959,14 @@ const getWeeklyForecast = async (latitude, longitude, diffInHours) => {
 
             console.log(generalProviderSelector.value)
             if (generalProviderSelector.value == providerNames[1]) {
-                console.log("Weekly data of API 2 is ignored now.")
-                //getWeeklyAPI2()
+                //The number of free API calls is pretty limited, so you can comment these two lines out when not essential
+                console.log("Weekly data of API 2 is showed now.")
+                getWeeklyAPI2()
             }
             else if (generalProviderSelector.value == providerNames[2]) {
-                //getWeeklyAPI3(latitude, longitude, diffInHours)
-                console.log("Weekly data of API 3 is ignored now.")
+                //The number of free API calls is pretty limited, so you can comment these two lines out when not essential
+                getWeeklyAPI3(latitude, longitude, diffInHours)
+                console.log("Weekly data of API 3 is showed now.")
             }
         }
     }, 100);
