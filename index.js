@@ -197,8 +197,6 @@ const temperatures = {
     ]
 }
 
-//console.log(temperatures.hourlyDay[0].length)
-
 searchButton.addEventListener("click", (e) => {
     addFavButton.innerText = "Favorite"
 
@@ -840,7 +838,7 @@ async function getWeeklyAPI2() {
     }
 
 }
-
+// Source: https://www.geeksforgeeks.org/javascript/javascript-program-to-find-largest-element-in-an-array/
 function findGreatest(array) {
     return array.reduce((largest, current) =>
         (current > largest ? current : largest), array[0]);
@@ -1271,6 +1269,7 @@ const loadMap = async (lat, lon) => {
 
 /*
 //Tried to make button /select grabbable as a funny feature. Maybe next time
+//This is from ChatGPT
   let offsetX = 0;
   let offsetY = 0;
   let isDragging = false;
