@@ -1045,7 +1045,7 @@ const loadMyIcon = (description, temperature, sunrise, sunset, timeDiff) => {
     const HOT_TEMP_KELV = HOT_TEMP_CELS + 273.15
     if ((selector.value == CELSIUS && temperature >= HOT_TEMP_CELS) || (selector.value == FAHRENHEIT && temperature >= HOT_TEMP_FAHR) || (selector.value == KELVIN && temperature >= HOT_TEMP_KELV)) {
         if(night){
-            iconPath = "assets/nigth/hot_night.png"
+            iconPath = "assets/night/hot_night.png"
         }else{
             iconPath = "assets/day/hot.png"
         }
