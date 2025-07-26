@@ -1,6 +1,8 @@
 const searchArea = document.getElementById("search-bar")
 const searchButton = document.getElementById("button-search")
 const locationButton = document.getElementById("geolocation");
+const status = document.querySelector("#status");
+status.innerText=""
 const currentIconImg = document.getElementById("current-icon")
 const addFavButton = document.getElementById("add-favorite")
 const favDiv = document.getElementById("favorites")
@@ -13,6 +15,7 @@ const hourSlider = document.getElementById("hours-slider")
 hourSlider.min = 1
 hourSlider.max = 48
 hourSlider.value = 24
+hourSlider.disabled = true
 const generalProviderSelector = document.getElementById("general-provider-selector")
 const weeklyDiv = document.getElementById("div-weekly")
 
@@ -221,7 +224,6 @@ searchButton.addEventListener("click", (e) => {
 locationButton.addEventListener("click", async () => {
     //source: https://developer.mozilla.org/en-US/docs/Web/API/Geolocation_API/Using_the_Geolocation_API#examples
 
-    const status = document.querySelector("#status");
 
     async function success(position) {
         const latitude = position.coords.latitude;
@@ -313,52 +315,38 @@ async function searchByCityName(searchTerm) {
     console.log(JSON)
     console.log("Searching for " + JSON.name)
 
-    //const date = new Date();
     let diffInHours = JSON.timezone / 3600
-    //console.log(date.getUTCHours())
-    //console.log(diffInHours)
-    //const hour = date.getUTCHours() + diffInHours
 
     let sunrise = JSON.sys.sunrise
-    let sunset = JSON.sys.sunset
-
     //Source: https://stackoverflow.com/questions/847185/convert-a-unix-timestamp-to-time-in-javascript
     // Create a new JavaScript Date object based on the timestamp
     // multiplied by 1000 so that the argument is in milliseconds, not seconds
     sunrise = new Date(sunrise * 1000);
-
     // Hours part from the timestamp
     var hours = sunrise.getUTCHours() + diffInHours;
-
     // Minutes part from the timestamp
     var minutes = "0" + sunrise.getMinutes();
-
     sunrise.setHours(hours)
-
     // Will display time in 10:30:23 format
     formattedSunrise = sunrise.getHours() + ':' + minutes.substr(-2)
     console.log(formattedSunrise);
 
+    let sunset = JSON.sys.sunset
     sunset = new Date(sunset * 1000);
-
     // Hours part from the timestamp
     var hours = sunset.getUTCHours() + diffInHours;
-
     // Minutes part from the timestamp
     var minutes = "0" + sunset.getMinutes();
-
     sunset.setHours(hours)
-
     // Will display time in 10:30:23 format
     formattedSunset = sunset.getHours() + ':' + minutes.substr(-2)
     console.log(formattedSunset);
 
-
-
-    document.getElementById("city").innerText = JSON.name + ", " + JSON.sys.country
-    //document.getElementById("unit").innerText = selector.value
     addToLastVisited(JSON.name)
     searchArea.value = JSON.name
+    
+    document.getElementById("city").innerText = JSON.name + ", " + JSON.sys.country
+    //document.getElementById("unit").innerText = selector.value
     //let countryCode = JSON.sys.country
     //document.getElementById("country").innerText = countryCode
 
@@ -369,35 +357,32 @@ async function searchByCityName(searchTerm) {
     const html = document.getElementsByTagName("html")
     const body = document.getElementsByTagName("body")
     //testing
+    //body[0].setAttribute("class", "test")
     //html[0].setAttribute("class", "stormy")
     //body[0].setAttribute("class", "stormy")
     html[0].setAttribute("class", setTheme(JSON.weather[0].description, JSON.main.temp, sunrise, sunset, diffInHours))
     body[0].setAttribute("class", setTheme(JSON.weather[0].description, JSON.main.temp, sunrise, sunset, diffInHours))
-    //body[0].setAttribute("class", "test")
 
-
-
-
+    
     const latitude = JSON.coord.lat
     const longitude = JSON.coord.lon
     loadMap(latitude, longitude)
 
-
-    let date = new Date()
-    console.log(date.getUTCHours())
-
+    //Load hourly forecast of API 2 and 3. The number of free API calls is pretty limited, so you can comment these two lines out when not essential
     //HourlyApi3(latitude, longitude, date.getUTCHours(), diffInHours)
     //HourlyApi2(date.getUTCHours(), diffInHours)
 
-
-
+    //Display various details about the current weather
     let mainWeatherDescr = JSON.weather[0].description
     let mainWeather = JSON.weather[0].main
     let feelsLike = JSON.main.feels_like
     let humidity = JSON.main.humidity
     let pressure = JSON.main.pressure
     let visibility = JSON.visibility / 1000
+    let windDegree = JSON.wind.deg
+    let windSpeed = JSON.wind.speed
 
+    document.getElementById("temperature").innerHTML = `${JSON.main.temp}<sup>${selector.value}</sup>`
     document.getElementById("main-description").innerText = mainWeather + ", " + mainWeatherDescr
     document.getElementById("feels-like").innerHTML = `Feels like: ${feelsLike}<sup>${selector.value}</sup>`
     document.getElementById("sunrise").innerText = "Sunrise: " + formattedSunrise
@@ -405,16 +390,101 @@ async function searchByCityName(searchTerm) {
     document.getElementById("humidity").innerText = "Humidity: " + humidity + "%"
     document.getElementById("pressure").innerText = "Pressure: " + pressure + "hPa"
     document.getElementById("visibility").innerText = "Visibility: " + visibility + "km"
-
-    let windDegree = JSON.wind.deg
-    let windSpeed = JSON.wind.speed
-
     document.getElementById("wind-deg").innerText = "Wind degree: " + windDegree + "°"
     document.getElementById("wind-speed").innerText = "Wind speed: " + windSpeed + "km/h"
 
+
+    createChart()
+    getWeeklyForecast(latitude, longitude, diffInHours)
+
+}
+
+//for now only used in "use current location" feature
+const searchByLatLong = async (latitude, longitude) => {
+
+    let JSON = await ((await fetch("https://api.openweathermap.org/data/2.5/weather?lat=" + latitude + "&lon=" + longitude + "&appid=" + apiKey1 + getUnits())).json())
+    console.log(JSON)
+    searchArea.value = JSON.name
+    console.log("Found " + JSON.name + " with latitude " + latitude + " and longitude " + longitude)
+
+    let diffInHours = JSON.timezone / 3600
+
+    let sunrise = JSON.sys.sunrise
+    //Source: https://stackoverflow.com/questions/847185/convert-a-unix-timestamp-to-time-in-javascript
+    // Create a new JavaScript Date object based on the timestamp
+    // multiplied by 1000 so that the argument is in milliseconds, not seconds
+    sunrise = new Date(sunrise * 1000);
+    // Hours part from the timestamp
+    var hours = sunrise.getUTCHours() + diffInHours;
+    // Minutes part from the timestamp
+    var minutes = "0" + sunrise.getMinutes();
+    sunrise.setHours(hours)
+    // Will display time in 10:30:23 format
+    formattedSunrise = sunrise.getHours() + ':' + minutes.substr(-2)
+    console.log(formattedSunrise);
+
+    let sunset = JSON.sys.sunset
+    sunset = new Date(sunset * 1000);
+    // Hours part from the timestamp
+    var hours = sunset.getUTCHours() + diffInHours;
+    // Minutes part from the timestamp
+    var minutes = "0" + sunset.getMinutes();
+    sunset.setHours(hours)
+    // Will display time in 10:30:23 format
+    formattedSunset = sunset.getHours() + ':' + minutes.substr(-2)
+    console.log(formattedSunset);
+
+    addToLastVisited(JSON.name)
+    searchArea.value = JSON.name
+    
+    document.getElementById("city").innerText = JSON.name + ", " + JSON.sys.country
+    //document.getElementById("unit").innerText = selector.value
+    //let countryCode = JSON.sys.country
+    //document.getElementById("country").innerText = countryCode
+
+    currentIconImg.src = loadMyIcon(JSON.weather[0].description, JSON.main.temp, sunrise, sunset, diffInHours)
+    currentIconImg.setAttribute("class", "current-icon")
+
+    //set theme based on weather
+    const html = document.getElementsByTagName("html")
+    const body = document.getElementsByTagName("body")
+    //testing
+    //body[0].setAttribute("class", "test")
+    //html[0].setAttribute("class", "stormy")
+    //body[0].setAttribute("class", "stormy")
+    html[0].setAttribute("class", setTheme(JSON.weather[0].description, JSON.main.temp, sunrise, sunset, diffInHours))
+    body[0].setAttribute("class", setTheme(JSON.weather[0].description, JSON.main.temp, sunrise, sunset, diffInHours))
+    //html[0].setAttribute("class", "rainy-cloudy")
+    //body[0].setAttribute("class", "rainy-cloudy")
+
+    loadMap(latitude, longitude)
+
+    //Load hourly forecast of API 2 and 3. The number of free API calls is pretty limited, so you can comment these two lines out when not essential
+    //HourlyApi3(latitude, longitude, date.getUTCHours(), diffInHours)
+    //HourlyApi2(date.getUTCHours(), diffInHours)
+
+    //Display various details about the current weather
+    let mainWeatherDescr = JSON.weather[0].description
+    let mainWeather = JSON.weather[0].main
+    let feelsLike = JSON.main.feels_like
+    let humidity = JSON.main.humidity
+    let pressure = JSON.main.pressure
+    let visibility = JSON.visibility / 1000
+    let windDegree = JSON.wind.deg
+    let windSpeed = JSON.wind.speed
+
     document.getElementById("temperature").innerHTML = `${JSON.main.temp}<sup>${selector.value}</sup>`
+    document.getElementById("main-description").innerText = mainWeather + ", " + mainWeatherDescr
+    document.getElementById("feels-like").innerHTML = `Feels like: ${feelsLike}<sup>${selector.value}</sup>`
+    document.getElementById("sunrise").innerText = "Sunrise: " + formattedSunrise
+    document.getElementById("sunset").innerText = "Sunset: " + formattedSunset
+    document.getElementById("humidity").innerText = "Humidity: " + humidity + "%"
+    document.getElementById("pressure").innerText = "Pressure: " + pressure + "hPa"
+    document.getElementById("visibility").innerText = "Visibility: " + visibility + "km"
+    document.getElementById("wind-deg").innerText = "Wind degree: " + windDegree + "°"
+    document.getElementById("wind-speed").innerText = "Wind speed: " + windSpeed + "km/h"
 
-
+    
     createChart()
     getWeeklyForecast(latitude, longitude, diffInHours)
 
@@ -571,44 +641,6 @@ async function HourlyApi3(latitude, longitude, UTCHour, diffInHours) {
 
     hourlyDataTotal[2] = api3HourlyValues
     console.log(hourlyDataTotal)
-}
-
-const searchByLatLong = async (latitude, longitude) => {
-
-    let JSON = await ((await fetch("https://api.openweathermap.org/data/2.5/weather?lat=" + latitude + "&lon=" + longitude + "&appid=" + apiKey1 + getUnits())).json())
-    console.log(JSON)
-    searchArea.value = JSON.name
-    let countryCode = JSON.sys.country
-    document.getElementById("city").innerText = JSON.name
-    document.getElementById("country").innerText = countryCode
-    console.log("Found " + JSON.name + " with latitude " + latitude + " and longitude " + longitude)
-
-    let mainWeatherDescr = JSON.weather[0].description
-    let mainWeather = JSON.weather[0].main
-    let feelsLike = JSON.main.feels_like
-    let humidity = JSON.main.humidity
-    let pressure = JSON.main.pressure
-    let visibility = JSON.visibility / 1000
-
-    document.getElementById("main-description").innerText = mainWeather
-    document.getElementById("feels-like").innerText = "Feels like " + feelsLike + selector.value
-    document.getElementById("humidity").innerText = "Humidity: " + humidity + "%"
-    document.getElementById("pressure").innerText = "Pressure: " + pressure + "hPa"
-    document.getElementById("visibility").innerText = "Visibility: " + visibility + "km"
-
-
-    let windDegree = JSON.wind.deg
-    let windSpeed = JSON.wind.speed
-
-    document.getElementById("wind-deg").innerText = "Wind degree: " + windDegree + "°"
-    document.getElementById("wind-speed").innerText = "Wind speed: " + windSpeed + "km/h"
-
-    document.getElementById("temperature").innerText = JSON.main.temp + selector.value
-
-    createChart()
-    getWeeklyForecast(7)
-    loadMap(latitude, longitude)
-
 }
 
 async function createChart() {
@@ -942,37 +974,39 @@ const getWeeklyForecast = async (latitude, longitude, diffInHours) => {
 const loadMyIcon = (description, temperature, sunrise, sunset, timeDiff) => {
 
     let iconPathsDay = {
-        "sky is clear": "assets/sun.png",
-        "clear sky": "assets/sun.png",
-        "few clouds": "assets/cloud_sun.png",
-        "scattered clouds": "assets/cloud.png",
-        "overcast clouds": "assets/cloud.png",
-        "broken clouds": "assets/cloud_sun.png",
-        "shower rain": "assets/cloud_rain_sun.png",
-        "rain": "assets/heavy_rain.png",
-        "heavy intensity rain": "assets/heavy_rain.png",
-        "moderate rain": "assets/heavy_rain.png",
-        "light rain": "assets/cloud_rain_sun.png",
-        "thunderstorm": "assets/storm.png",
-        "snow": "assets/snowflake.png",
-        "mist": "assets/mist.png",
+        "sky is clear": "assets/day/sun.png",
+        "clear sky": "assets/day/sun.png",
+        "few clouds": "assets/day/cloud_sun.png",
+        "scattered clouds": "assets/day/cloud.png",
+        "overcast clouds": "assets/day/cloud.png",
+        "broken clouds": "assets/day/cloud_sun.png",
+        "shower rain": "assets/day/cloud_rain_sun.png",
+        "rain": "assets/day/heavy_rain.png",
+        "heavy intensity rain": "assets/day/heavy_rain.png",
+        "moderate rain": "assets/day/heavy_rain.png",
+        "light rain": "assets/day/cloud_rain_sun.png",
+        "thunderstorm": "assets/day/storm.png",
+        "snow": "assets/day/snowflake.png",
+        "mist": "assets/day/mist.png",
+        "haze": "assets/day/mist.png",
     }
 
     let iconPathsNight = {
-        "sky is clear": "assets/moon.png",
-        "clear sky": "assets/moon.png",
-        "few clouds": "assets/cloud_night.png",
-        "scattered clouds": "assets/cloud_night.png",
-        "overcast clouds": "assets/cloud_night.png",
-        "broken clouds": "assets/cloud_night.png",
-        "shower rain": "assets/rain_night.png",
-        "rain": "assets/rain_night.png",
-        "heavy intensity rain": "assets/rain_night.png",
-        "moderate rain": "assets/rain_night.png",
-        "light rain": "assets/rain_night.png",
-        "thunderstorm": "assets/storm_night.png",
-        "snow": "assets/snow_night.png",
-        "mist": "assets/mist.png",
+        "sky is clear": "assets/nigth/moon.png",
+        "clear sky": "assets/nigth/moon.png",
+        "few clouds": "assets/nigth/cloud_night.png",
+        "scattered clouds": "assets/nigth/cloud_night.png",
+        "overcast clouds": "assets/nigth/cloud_night.png",
+        "broken clouds": "assets/nigth/cloud_night.png",
+        "shower rain": "assets/nigth/rain_night.png",
+        "rain": "assets/nigth/rain_night.png",
+        "heavy intensity rain": "assets/nigth/rain_night.png",
+        "moderate rain": "assets/nigth/rain_night.png",
+        "light rain": "assets/nigth/rain_night.png",
+        "thunderstorm": "assets/nigth/storm_night.png",
+        "snow": "assets/nigth/snow_night.png",
+        "mist": "assets/day/mist.png",
+        "haze": "assets/day/mist.png",
     }
 
     //check whether it is night
@@ -1013,9 +1047,9 @@ const loadMyIcon = (description, temperature, sunrise, sunset, timeDiff) => {
     const HOT_TEMP_KELV = HOT_TEMP_CELS + 273.15
     if ((selector.value == CELSIUS && temperature >= HOT_TEMP_CELS) || (selector.value == FAHRENHEIT && temperature >= HOT_TEMP_FAHR) || (selector.value == KELVIN && temperature >= HOT_TEMP_KELV)) {
         if(night){
-            iconPath = "assets/hot_night.png"
+            iconPath = "assets/nigth/hot_night.png"
         }else{
-            iconPath = "assets/hot.png"
+            iconPath = "assets/day/hot.png"
         }
     }
 
@@ -1028,20 +1062,21 @@ const loadMyIcon = (description, temperature, sunrise, sunset, timeDiff) => {
 const loadMyIcon2 = (description, temperature) => {
 
     let iconPaths = {
-        "sky is clear": "assets/sun.png",
-        "clear sky": "assets/sun.png",
-        "few clouds": "assets/cloud_sun.png",
-        "scattered clouds": "assets/cloud.png",
-        "overcast clouds": "assets/cloud.png",
-        "broken clouds": "assets/cloud_sun.png",
-        "shower rain": "assets/cloud_rain_sun.png",
-        "rain": "assets/heavy_rain.png",
-        "heavy intensity rain": "assets/heavy_rain.png",
-        "moderate rain": "assets/heavy_rain.png",
-        "light rain": "assets/cloud_rain_sun.png",
-        "thunderstorm": "assets/storm.png",
-        "snow": "assets/snowflake.png",
-        "mist": "assets/mist.png",
+        "sky is clear": "assets/day/sun.png",
+        "clear sky": "assets/day/sun.png",
+        "few clouds": "assets/day/cloud_sun.png",
+        "scattered clouds": "assets/day/cloud.png",
+        "overcast clouds": "assets/day/cloud.png",
+        "broken clouds": "assets/day/cloud_sun.png",
+        "shower rain": "assets/day/cloud_rain_sun.png",
+        "rain": "assets/day/heavy_rain.png",
+        "heavy intensity rain": "assets/day/heavy_rain.png",
+        "moderate rain": "assets/day/heavy_rain.png",
+        "light rain": "assets/day/cloud_rain_sun.png",
+        "thunderstorm": "assets/day/storm.png",
+        "snow": "assets/day/snowflake.png",
+        "mist": "assets/day/mist.png",
+        "haze": "assets/day/mist.png",
     }
 
     let iconPath
@@ -1062,7 +1097,7 @@ const loadMyIcon2 = (description, temperature) => {
     const HOT_TEMP_FAHR = HOT_TEMP_CELS * (9 / 5) + 32
     const HOT_TEMP_KELV = HOT_TEMP_CELS + 273.15
     if ((selector.value == CELSIUS && temperature >= HOT_TEMP_CELS) || (selector.value == FAHRENHEIT && temperature >= HOT_TEMP_FAHR) || (selector.value == KELVIN && temperature >= HOT_TEMP_KELV)) {
-        iconPath = "assets/hot.png"
+        iconPath = "assets/day/hot.png"
         console.log("This city is hot!!")
     }
 
@@ -1078,7 +1113,7 @@ const setTheme = (description, temperature, sunrise, sunset, timeDiff) => {
         "few clouds": "sunny-cloudy",
         "scattered clouds": "cloudy",
         "overcast clouds": "cloudy",
-        "broken clouds": "assets/cloud_sun.png",
+        "broken clouds": "sunny-cloudy",
         "shower rain": "sunny-rainy",
         "rain": "rainy-cloudy",
         "moderate rain": "rainy-cloudy",
@@ -1099,7 +1134,7 @@ const setTheme = (description, temperature, sunrise, sunset, timeDiff) => {
             console.log(className)
             break
         }
-        console.log("Suitable icon not found.")
+        console.log("Suitable theme not found.")
     }
 
     let hot = false;

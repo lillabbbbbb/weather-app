@@ -1,9 +1,7 @@
 :root {
     --main-color: #f0e06dd8;
     --main-background-color: 
-        linear-gradient(red, transparent),
-        linear-gradient(to top left, lime, transparent),
-        linear-gradient(to top right, blue, transparent);
+        linear-gradient(45deg, #4b4330, #1875a0 50%, #f4f8b4);
     --card-background-light: rgba(255, 255, 255, var(--main-opacity));
     --card-background-dark: rgba(0, 0, 0, var(--main-opacity));
     --main-opacity: 0.4;
@@ -99,9 +97,9 @@ img,
     font-size: var(--basic-font-size);
 }
 
-button:hover,
-select:hover,
-input:hover,
+button:hover:not(.disabled),
+select:hover:not(.disabled),
+input:hover:not(.disabled),
 p:hover,
 h1:hover,
 img:hover {
@@ -136,6 +134,12 @@ input {
 .animate-change {
     transition: all 0.4s;
 }
+
+.disabled {
+    transform: none;
+    transition: none 0.4s;
+}
+
 
 .card-div {
     background-color: var(--card-background-light);
@@ -333,7 +337,7 @@ input {
 
 
 .sunny-cloudy {
-    background: linear-gradient(45deg, #4b4330, #47a3ce, #f4f8b4);
+    background: linear-gradient(45deg, #4b4330, #1875a0 50%, #f4f8b4);
     color: black;
 
     button,
@@ -401,7 +405,7 @@ input {
 
 .rainy-cloudy,
 .stormy {
-    background: linear-gradient(70deg, #577496 70%, rgb(138, 176, 207));
+    background: linear-gradient(20deg, #243a53, #577496, rgb(138, 176, 207));
     color: white;
 
     button,
