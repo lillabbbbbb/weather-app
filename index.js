@@ -1135,7 +1135,7 @@ const setTheme = (description, temperature, sunrise, sunset, timeDiff) => {
     const HOT_TEMP_KELV = HOT_TEMP_CELS + 273.15
     if ((selector.value == CELSIUS && temperature >= HOT_TEMP_CELS) || (selector.value == FAHRENHEIT && temperature >= HOT_TEMP_FAHR) || (selector.value == KELVIN && temperature >= HOT_TEMP_KELV)) {
         hot = true
-        className = "hot-cloudy"
+        className = "hot-sunny"
 
     }
     console.log(temperature + " " + className)

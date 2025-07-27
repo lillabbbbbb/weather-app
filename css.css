@@ -334,7 +334,23 @@ input {
 }
 
 .hot-sunny {
-    background: linear-gradient(70deg, orange 70%, red);
+    background: linear-gradient(45deg, #e28265, #ec9d26 50%, #f7f454);
+    color: black;
+
+    button,
+    select {
+        background: linear-gradient(20deg, #dd3c26d8 20%, rgb(243, 240, 88));
+        border-color: #06283D;
+        margin: 5px;
+    }
+
+    input {
+        border-color: #06283D;
+        background: #06283D;
+        color: white;
+        padding: 10px;
+    }
+
 }
 
 .sunny-rainy {}
