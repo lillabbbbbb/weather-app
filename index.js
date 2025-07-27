@@ -879,8 +879,8 @@ async function getWeeklyAPI3(latitude, longitude, diffInHours) {
                 dayArray.push(temperatures[j])
             }
             console.log(dayArray)
-            minArray[k] = convert(findGreatest(dayArray), CELSIUS, selector.value)
-            maxArray[k] = convert(findSmallest(dayArray), CELSIUS, selector.value)
+            minArray[k] = convert(findSmallest(dayArray), CELSIUS, selector.value)
+            maxArray[k] = convert(findGreatest(dayArray), CELSIUS, selector.value)
             k++
             i += 24
         }
@@ -976,6 +976,8 @@ const loadMyIcon = (description, temperature, sunrise, sunset, timeDiff) => {
         "light rain": "assets/day/cloud_rain_sun.png",
         "thunderstorm": "assets/day/storm.png",
         "snow": "assets/day/snowflake.png",
+        "light snow": "assets/day/snowflake.png",
+        "rain and snow": "assets/day/snowflake.png",
         "mist": "assets/day/mist.png",
         "haze": "assets/day/mist.png",
     }
@@ -994,6 +996,8 @@ const loadMyIcon = (description, temperature, sunrise, sunset, timeDiff) => {
         "light rain": "assets/night/rain_night.png",
         "thunderstorm": "assets/night/storm_night.png",
         "snow": "assets/night/snow_night.png",
+        "light snow": "assets/day/snow_night.png",
+        "rain and snow": "assets/day/snow_night.png",
         "mist": "assets/day/mist.png",
         "haze": "assets/day/mist.png",
     }
@@ -1111,7 +1115,11 @@ const setTheme = (description, temperature, sunrise, sunset, timeDiff) => {
         "light rain": "rainy-cloudy",
         "thunderstorm": "stormy",
         "snow": "snowy",
+        "light snow": "snowy",
+        "rain and snow": "snowy",
         "mist": "cloudy",
+        "haze": "cloudy",
+        
 
     }
 

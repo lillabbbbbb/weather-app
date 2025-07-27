@@ -255,6 +255,7 @@ input {
 
 .daily-f-card-div p {
     color: black;
+    margin: 0;
 }
 
 .chart-container {
@@ -265,6 +266,10 @@ input {
     overflow-x: auto;
     white-space: nowrap;
     flex-wrap: nowrap;
+}
+
+svg .data-point {
+  display: none;
 }
 
 #hourly-chart {
@@ -432,14 +437,22 @@ input {
 }
 
 .snowy {
-    background: linear-gradient(30deg, #abceeb 70%, rgb(231, 237, 241));
-    color: white;
+    background: linear-gradient(90deg,
+    rgba(223, 238, 245, 1) 0%,
+     rgb(193, 220, 243) 49%, 
+    rgba(232, 242, 250, 1) 100%);
+
+    color: black;
 
     button,
     select {
-        background: linear-gradient(20deg, rgb(231, 237, 241) 20%, #abceeb);
+        background: linear-gradient(20deg, #abceeb, rgb(255, 255, 255));
         border-color: #06283D;
         margin: 5px;
+    }
+
+    button, select, input, .daily-f-card-div, .card-div {
+        box-shadow: 0px 0px 50px 0px #0000001f;
     }
 
     input {
@@ -450,8 +463,16 @@ input {
     }
 
     .daily-f-card-div {
-        background: linear-gradient(30deg, #abceeb 70%, rgb(231, 237, 241));
+        background: linear-gradient(30deg,
+        rgb(193, 220, 243) 0%,
+    rgba(223, 238, 245, 1) 80%,
+    rgb(255, 255, 255) 100%);
     }
+
+    .card-div {
+        background-color: var(--card-background-light);
+    }
+
 }
 
 .rainy-cloudy,
@@ -536,7 +557,7 @@ input {
 
 }
 
-@media (min-width: 1100px) {
+@media (min-width: 600px) {
 
     /*Layout for desktops*/
 
