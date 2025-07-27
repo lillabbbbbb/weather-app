@@ -11,8 +11,22 @@
     --main-padding: 10px;
     --basic-font-size: 20px;
 }
+/*
+* {
+  outline: 1px solid red;
+}
+  */
+
+html, body {
+  margin: 0;
+  padding: 0;
+}
 
 /*Values that are common for all screens, most importantly mobile phones*/
+
+section .card-div {
+    overflow: hidden;
+}
 
 #map {
     height: 400px;
@@ -111,7 +125,7 @@ img:hover {
 }
 
 .daily-f-card-div:hover {
-    transform: scale(1.1);
+    transform: scale(1.08);
 }
 
 input {
@@ -243,6 +257,10 @@ input {
     color: black;
 }
 
+.chart-container {
+    margin-top: 40px;
+}
+
 #chart-container-div {
     overflow-x: auto;
     white-space: nowrap;
@@ -272,6 +290,19 @@ input {
 .daily-icon {
     height: 80px;
     align-items: left;
+}
+
+
+.frappe-chart .axis text {
+  fill: #aaa; /* axis labels */
+}
+
+.frappe-chart .legend text {
+  fill: #ccc; /* legend labels */
+}
+
+.frappe-chart .chart-label {
+  color: #eee; /* main title label */
 }
 
 .daily-f-card-div {
@@ -376,6 +407,10 @@ input {
 
     .card-div {
         background-color: var(--card-background-dark);
+    }
+
+    .frappe-chart {
+        fill: white;
     }
 
 }
@@ -505,9 +540,7 @@ input {
         font-size: calc(var(--basic-font-size) * 0.5);
     }
 
-    header {
-        max-width: 3000px;
-    }
+    
 
     header .center-card {
         max-width: 3000px;
@@ -520,13 +553,21 @@ input {
     }
 
     .row {
-        max-width: 2000px;
+        margin: autos;
+    }
+
+    #map-div {
+        max-width: 2100px;
+        margin: auto;
+    }
+
+    #map {
+        height: 800px;
     }
 
     .daily-f-card-div {
         width: fit-content;
-        margin-left: 5px;
-        margin-right: 5px;
+        margin-left: 7px;
     }
 
 }

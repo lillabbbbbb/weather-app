@@ -64,11 +64,6 @@ let providerNames = [
     "OpenMeteo"
 ]
 
-let runProviders = {
-    "OpenWeatherMap": searchByCityName(),
-    "Tomorrow IO": loadAPI2(),
-    "OpenMeteo": loadAPI3(),
-}
 let k = 0
 for (let i = 0; i < providerNames.length; i++) {
     let option1 = document.createElement("option")
@@ -369,8 +364,8 @@ async function searchByCityName(searchTerm) {
     loadMap(latitude, longitude)
 
     //Load hourly forecast of API 2 and 3. The number of free API calls is pretty limited, so you can comment these two lines out when not essential
-    HourlyApi3(latitude, longitude, date.getUTCHours(), diffInHours)
-    HourlyApi2(date.getUTCHours(), diffInHours)
+    //HourlyApi3(latitude, longitude, date.getUTCHours(), diffInHours)
+    //HourlyApi2(date.getUTCHours(), diffInHours)
 
     //Display various details about the current weather
     let mainWeatherDescr = JSON.weather[0].description
@@ -490,15 +485,6 @@ const searchByLatLong = async (latitude, longitude) => {
 
 }
 
-function loadAPI2() {
-    console.log("This is loadAPI2 function.")
-}
-
-function loadAPI3() {
-    console.log("This is loadAPI3 function.")
-}
-
-
 function fromUnixToCurrent(unixTime, diffInHours) {
 
     var date = new Date(unixTime * 1000);
@@ -598,6 +584,7 @@ async function HourlyApi2(UTCHour, diffInHours) {
     }
 
     hourlyDataTotal[1] = tomHourlyValues
+    console.log(hourlyDataTotal[1])
 }
 
 async function HourlyApi3(latitude, longitude, UTCHour, diffInHours) {
@@ -961,11 +948,11 @@ const getWeeklyForecast = async (latitude, longitude, diffInHours) => {
             if (generalProviderSelector.value == providerNames[1]) {
                 //The number of free API calls is pretty limited, so you can comment these two lines out when not essential
                 console.log("Weekly data of API 2 is showed now.")
-                getWeeklyAPI2()
+                //getWeeklyAPI2()
             }
             else if (generalProviderSelector.value == providerNames[2]) {
                 //The number of free API calls is pretty limited, so you can comment these two lines out when not essential
-                getWeeklyAPI3(latitude, longitude, diffInHours)
+                //getWeeklyAPI3(latitude, longitude, diffInHours)
                 console.log("Weekly data of API 3 is showed now.")
             }
         }
@@ -1077,6 +1064,8 @@ const loadMyIcon2 = (description, temperature) => {
         "light rain": "assets/day/cloud_rain_sun.png",
         "thunderstorm": "assets/day/storm.png",
         "snow": "assets/day/snowflake.png",
+        "light snow": "assets/day/snowflake.png",
+        "rain and snow": "assets/day/snowflake.png",
         "mist": "assets/day/mist.png",
         "haze": "assets/day/mist.png",
     }
