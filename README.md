@@ -14,3 +14,6 @@ Yakutsk
 Bangkok
 Baghdad
 Tokyo
+
+## Attribution
+All icons from ![Freepik](https://www.flaticon.com/authors/freepik)
