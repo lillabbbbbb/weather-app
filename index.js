@@ -972,6 +972,7 @@ const loadMyIcon = (description, temperature, sunrise, sunset, timeDiff) => {
         "shower rain": "assets/day/cloud_rain_sun.png",
         "rain": "assets/day/heavy_rain.png",
         "heavy intensity rain": "assets/day/heavy_rain.png",
+        "very heavy rain": "assets/day/heavy_rain.png",
         "moderate rain": "assets/day/heavy_rain.png",
         "light rain": "assets/day/cloud_rain_sun.png",
         "thunderstorm": "assets/day/storm.png",
@@ -992,6 +993,7 @@ const loadMyIcon = (description, temperature, sunrise, sunset, timeDiff) => {
         "shower rain": "assets/night/rain_night.png",
         "rain": "assets/night/rain_night.png",
         "heavy intensity rain": "assets/night/rain_night.png",
+        "very heavy rain": "assets/night/rain_night.png",
         "moderate rain": "assets/night/rain_night.png",
         "light rain": "assets/night/rain_night.png",
         "thunderstorm": "assets/night/storm_night.png",
@@ -1063,6 +1065,7 @@ const loadMyIcon2 = (description, temperature) => {
         "broken clouds": "assets/day/cloud_sun.png",
         "shower rain": "assets/day/cloud_rain_sun.png",
         "rain": "assets/day/heavy_rain.png",
+        "very heavy rain": "assets/day/heavy_rain.png",
         "heavy intensity rain": "assets/day/heavy_rain.png",
         "moderate rain": "assets/day/heavy_rain.png",
         "light rain": "assets/day/cloud_rain_sun.png",
@@ -1112,6 +1115,7 @@ const setTheme = (description, temperature, sunrise, sunset, timeDiff) => {
         "shower rain": "sunny-rainy",
         "rain": "rainy-cloudy",
         "moderate rain": "rainy-cloudy",
+        "very heavy rain": "stormy",
         "light rain": "rainy-cloudy",
         "thunderstorm": "stormy",
         "snow": "snowy",
@@ -1180,37 +1184,6 @@ const setTheme = (description, temperature, sunrise, sunset, timeDiff) => {
     console.log(className)
 
     return className
-}
-
-const loadOWMIcon = (description) => {
-
-    iconCodes = {
-        "clear sky": "01d",
-        "few clouds": "02d",
-        "scattered clouds": "03d",
-        "broken clouds": "04d",
-        "shower rain": "09d",
-        "rain": "10d",
-        "thunderstorm": "11d",
-        "snow": "13d",
-        "mist": "50d",
-
-    }
-
-    let code;
-
-    for (let [key, value] of Object.entries(iconCodes)) {
-        console.log(`${key}: ${value}`);
-        console.log(description)
-        if (description = key) {
-            code = value
-            console.log(code)
-            break
-        }
-    }
-
-
-    return "https://openweathermap.org/img/wn/" + code + "@2x.png"
 }
 
 

@@ -9,18 +9,13 @@
     --main-margin: 10px;
     --main-border-radius: 35px;
     --main-padding: 10px;
-    --basic-font-size: 20px;
+    --basic-font-size: 15px;
 }
 /*
 * {
   outline: 1px solid red;
 }
   */
-
-html, body {
-  margin: 0;
-  padding: 0;
-}
 
 /*Values that are common for all screens, most importantly mobile phones*/
 
@@ -63,6 +58,8 @@ body {
     font-family: Bahnschrift, 'DIN Alternate', 'Franklin Gothic Medium', 'Nimbus Sans Narrow', sans-serif-condensed, sans-serif;
     font-weight: normal;
     background: var(--main-background-color);
+    margin: 0;
+  padding: 0;
 }
 
 footer {
@@ -578,7 +575,7 @@ svg .data-point {
     }
 
     .current {
-        max-width: 380px;
+        max-width: 300px;
     }
 
     .hourly {
@@ -609,7 +606,7 @@ svg .data-point {
     }
 
     .chart {
-        height: 361px;
+        height: 285px;
     }
 
 
