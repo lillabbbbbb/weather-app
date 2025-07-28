@@ -6,4 +6,4 @@
 ![](https://github.com/lillabbbbbb/weather-app/blob/main/readme_images/pc_sunny2.png)
 
 ## Attribution
-All icons from ![Freepik](https://www.flaticon.com/authors/freepik)
+All icons from ![Freepik](https://www.flaticon.com/authors/freepik/)
