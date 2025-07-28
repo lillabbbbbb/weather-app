@@ -364,8 +364,8 @@ async function searchByCityName(searchTerm) {
     loadMap(latitude, longitude)
 
     //Load hourly forecast of API 2 and 3. The number of free API calls is pretty limited, so you can comment these two lines out when not essential
-    //HourlyApi3(latitude, longitude, date.getUTCHours(), diffInHours)
-    //HourlyApi2(date.getUTCHours(), diffInHours)
+    HourlyApi3(latitude, longitude, date.getUTCHours(), diffInHours)
+    HourlyApi2(date.getUTCHours(), diffInHours)
 
     //Display various details about the current weather
     let mainWeatherDescr = JSON.weather[0].description
@@ -948,11 +948,11 @@ const getWeeklyForecast = async (latitude, longitude, diffInHours) => {
             if (generalProviderSelector.value == providerNames[1]) {
                 //The number of free API calls is pretty limited, so you can comment these two lines out when not essential
                 console.log("Weekly data of API 2 is showed now.")
-                //getWeeklyAPI2()
+                getWeeklyAPI2()
             }
             else if (generalProviderSelector.value == providerNames[2]) {
                 //The number of free API calls is pretty limited, so you can comment these two lines out when not essential
-                //getWeeklyAPI3(latitude, longitude, diffInHours)
+                getWeeklyAPI3(latitude, longitude, diffInHours)
                 console.log("Weekly data of API 3 is showed now.")
             }
         }

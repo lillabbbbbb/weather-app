@@ -577,7 +577,13 @@ svg .data-point {
         font-size: calc(var(--basic-font-size) * 0.5);
     }
 
-    
+    .current {
+        max-width: 380px;
+    }
+
+    .hourly {
+        width: 800px;
+    }
 
     header .center-card {
         max-width: 3000px;
@@ -590,7 +596,7 @@ svg .data-point {
     }
 
     .row {
-        margin: autos;
+        margin: auto;
     }
 
     #map-div {
@@ -599,8 +605,13 @@ svg .data-point {
     }
 
     #map {
-        height: 800px;
+        max-height: 800px;
     }
+
+    .chart {
+        height: 361px;
+    }
+
 
     .daily-f-card-div {
         width: fit-content;
