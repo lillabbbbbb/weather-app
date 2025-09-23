@@ -19,8 +19,8 @@ hourSlider.disabled = true
 const generalProviderSelector = document.getElementById("general-provider-selector")
 const weeklyDiv = document.getElementById("div-weekly")
 
-const apiKey1 = "d84bd23391e17b943fc45b049bd574d4"
-const apiKey2 = "Cgp1nINqRCsErUN8HM74lwRgOyAP0ulF"
+const apiKey1 = ""
+const apiKey2 = ""
 const apikey3 = ""
 
 const CELSIUS = "℃"
